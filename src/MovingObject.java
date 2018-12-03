@@ -8,7 +8,7 @@ public class MovingObject {
     private double xSpeed = 0.0;
     private double ySpeed = 0.0;
     private int id;
-    private double gravAcc = 1000.0;
+    private double gravAcc = 2500.0;
     private double xAcc = 0.0;
     private double yAcc = 0.0;
     private int time = 0;
@@ -28,16 +28,31 @@ public class MovingObject {
         yAcc = -1/2 * ySpeed;
         */
 
-
-
         xSpeed += xAcc / fps;
         ySpeed += gravAcc / fps + yAcc / fps;
 
         xCord += xSpeed/fps;
         yCord += ySpeed/fps;
 
+        checkIfInFrame();
+    }
+
+    public void checkIfInFrame() {
+
+        if(yCord < 0) {
+            yCord = 0;
+        }
+
         if (yCord > frameHeight - height) {
             yCord = frameHeight - height;
+        }
+
+        if(xCord <= 0) {
+            xCord = 0;
+        }
+
+        if(xCord >= frameWidth - width) {
+            xCord = frameWidth - width;
         }
     }
 

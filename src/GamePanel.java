@@ -21,7 +21,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         thread = new Thread(this);
 
-        rObj = new MovingObject(0,50,50);
+        rObj = new MovingObject(0,10,30);
         rObj.setxCord(375);
         rObj.setyCord(275);
 
@@ -53,14 +53,16 @@ public class GamePanel extends JPanel implements Runnable {
             time++;
             rObj.setTime(time);
             rObj.calculatePosition();
-            if(lastMove != 0) {
-                if(lastMove == 1) {
-                    rObj.setxCord(rObj.getxCord()+10);
-                }
-                else if(lastMove == 2) {
-                    rObj.setxCord(rObj.getxCord()-10);
-                }
+
+            if(lastMove == 1 && lastMove != 11) {
+                rObj.setxCord(rObj.getxCord()+10);
+                rObj.checkIfInFrame();
             }
+            else if(lastMove == 2 && lastMove != 12) {
+                rObj.setxCord(rObj.getxCord()-10);
+                rObj.checkIfInFrame();
+            }
+
             repaint();
 
         }
@@ -86,7 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-            rObj.setySpeed(-500);
+            rObj.setySpeed(-1000);
         }
         if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
             lastMove = 1;
@@ -98,10 +100,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void keyReleased(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            lastMove = 0;
+            if(lastMove != 2) {
+                lastMove = 11;
+            }
         }
         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-            lastMove = 0;
+            if(lastMove != 1) {
+                lastMove = 12;
+            }
         }
     }
 }
