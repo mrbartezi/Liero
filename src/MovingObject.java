@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class MovingObject {
     private static int frameWidth;
     private static int frameHeight;
@@ -13,6 +15,7 @@ public class MovingObject {
     private double yAcc = 0.0;
     private int time = 0;
     private int fps = 60;
+    private static ArrayList<StaticObject> staticObjectsList;
 
     public MovingObject(int id, int width, int height) {
         this.id = id;
@@ -41,6 +44,7 @@ public class MovingObject {
 
         if(yCord < 0) {
             yCord = 0;
+            ySpeed = 0;
         }
 
         if (yCord > frameHeight - height) {
@@ -54,6 +58,23 @@ public class MovingObject {
         if(xCord >= frameWidth - width) {
             xCord = frameWidth - width;
         }
+
+        for(StaticObject s : staticObjectsList) {
+            if(xCord >= s.getX1() - width && xCord <= s.getX2()){
+                if(yCord + height >= s.getY1() && yCord + height < s.getY1() + ySpeed/fps + 1) {
+                    yCord = s.getY1() - height;
+                    ySpeed = 0;
+                }
+            }
+        }
+    }
+
+    public ArrayList<StaticObject> getStaticObjectsList() {
+        return staticObjectsList;
+    }
+
+    public static void setStaticObjectsList(ArrayList<StaticObject> List) {
+        staticObjectsList = List;
     }
 
     public int getWidth() {

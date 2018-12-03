@@ -2,15 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
 
     private MovingObject rObj;
     private Thread thread;
-    private boolean running;
+    private boolean running, onGround;
     private int time = 0, timeInSeconds = 0, count = 0;
     private int fps = 60;
     private int lastMove = 0;
+    private ArrayList<StaticObject> staticObjectsList;
+
 
 
     public GamePanel(int frameWidth, int frameHeight) {
@@ -18,6 +21,15 @@ public class GamePanel extends JPanel implements Runnable {
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
+
+        staticObjectsList = new ArrayList<>();
+        staticObjectsList.add(new StaticObject(0, frameHeight, frameWidth, frameHeight));
+        staticObjectsList.add(new StaticObject(350, 450, 450, 600));
+        staticObjectsList.add(new StaticObject(220, 300, 320, 310));
+        staticObjectsList.add(new StaticObject(480, 300, 580, 310));
+        staticObjectsList.add(new StaticObject(350, 150, 450, 160));
+        MovingObject.setStaticObjectsList(staticObjectsList);
+
 
         thread = new Thread(this);
 
@@ -33,6 +45,9 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
         g2.setPaint(Color.WHITE);
         Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), Math.floor(rObj.getyCord()), rObj.getWidth(), rObj.getHeight());
+        for(StaticObject s : staticObjectsList) {
+            g2.fill(new Rectangle2D.Double(s.getX1(), s.getY1(), s.getX2() - s.getX1(), s.getY2() - s.getY1()));
+        }
         g2.fill(rect);
     }
 
@@ -88,7 +103,19 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-            rObj.setySpeed(-1000);
+
+            for(StaticObject s : staticObjectsList) {
+                if(rObj.getxCord() >= s.getX1() - rObj.getWidth() && rObj.getxCord() <= s.getX2()){
+                    if(rObj.getyCord() + rObj.getHeight() >= s.getY1() &&
+                            rObj.getyCord() + rObj.getHeight() < s.getY1() + rObj.getySpeed()/fps + 1) {
+                        onGround = true;
+                    }
+                }
+            }
+            if(onGround) {
+                rObj.setySpeed(-1000);
+                onGround = false;
+            }
         }
         if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
             lastMove = 1;
