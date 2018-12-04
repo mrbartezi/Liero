@@ -24,7 +24,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         staticObjectsList = new ArrayList<>();
         staticObjectsList.add(new StaticObject(0, frameHeight, frameWidth, frameHeight));
-        staticObjectsList.add(new StaticObject(350, 450, 450, 600));
+        staticObjectsList.add(new StaticObject(350, 450, 450, 550));
         staticObjectsList.add(new StaticObject(220, 300, 320, 310));
         staticObjectsList.add(new StaticObject(480, 300, 580, 310));
         staticObjectsList.add(new StaticObject(350, 150, 450, 160));
@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         rObj = new MovingObject(0,10,30);
         rObj.setxCord(375);
-        rObj.setyCord(275);
+        rObj.setyCord(400);
 
         start();
     }
@@ -43,11 +43,15 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+
         g2.setPaint(Color.WHITE);
-        Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), Math.floor(rObj.getyCord()), rObj.getWidth(), rObj.getHeight());
         for(StaticObject s : staticObjectsList) {
             g2.fill(new Rectangle2D.Double(s.getX1(), s.getY1(), s.getX2() - s.getX1(), s.getY2() - s.getY1()));
         }
+
+        g2.setPaint(Color.RED);
+        Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), Math.floor(rObj.getyCord()),
+                rObj.getWidth(), rObj.getHeight());
         g2.fill(rect);
     }
 

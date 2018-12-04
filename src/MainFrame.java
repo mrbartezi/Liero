@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.security.Key;
 
 public class MainFrame extends JFrame implements KeyListener {
 
@@ -39,6 +40,12 @@ public class MainFrame extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         gamePanel.keyPressed(e);
+        if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            remove(gamePanel);
+            gamePanel = new GamePanel(frameWidth, frameHeight);
+            add(gamePanel, BorderLayout.CENTER);
+            pack();
+        }
     }
 
     @Override

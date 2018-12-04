@@ -60,10 +60,24 @@ public class MovingObject {
         }
 
         for(StaticObject s : staticObjectsList) {
-            if(xCord >= s.getX1() - width && xCord <= s.getX2()){
+            if(xCord > s.getX1() - width && xCord < s.getX2()){
                 if(yCord + height >= s.getY1() && yCord + height < s.getY1() + ySpeed/fps + 1) {
                     yCord = s.getY1() - height;
                     ySpeed = 0;
+                }
+
+                if(yCord <= s.getY2() && yCord >= s.getY2() + ySpeed/fps - 1) {
+                    yCord = s.getY2();
+                    ySpeed = 0;
+                }
+            }
+
+            if(yCord + height >= s.getY1() + ySpeed/fps + 1 && yCord <= s.getY2()) {
+                if(xCord + width >= s.getX1() && xCord + width <= s.getX1()+10) {
+                    xCord = s.getX1() - width;
+                }
+                if(xCord  <= s.getX2() && xCord >= s.getX2() - 10) {
+                    xCord = s.getX2();
                 }
             }
         }
