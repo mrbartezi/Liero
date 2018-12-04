@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Liero:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Liero_jar</output-path>
+    <root id="archive" name="Liero.jar">
+      <element id="module-output" name="Liero" />
+    </root>
+  </artifact>
+</component>
