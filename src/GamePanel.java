@@ -1,16 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
 
     private MovingObject rObj;
-    private Thread thread;
-    private boolean running, onGround;
-    private int time = 0, timeInSeconds = 0, count = 0;
-    private int fps = 60;
+    private Thread thread, posThread;
+    private boolean running, onGround, staticObjectsCollision = false,
+            editMode = true, controlPressed = false;
+    private int time = 0, timeInSeconds = 0;
+    private static int fps = 120;
     private int lastMove = 0;
     private ArrayList<StaticObject> staticObjectsList;
 
@@ -24,18 +26,29 @@ public class GamePanel extends JPanel implements Runnable {
 
         staticObjectsList = new ArrayList<>();
         staticObjectsList.add(new StaticObject(0, frameHeight, frameWidth, frameHeight));
-        staticObjectsList.add(new StaticObject(350, 450, 450, 550));
-        staticObjectsList.add(new StaticObject(220, 300, 320, 310));
-        staticObjectsList.add(new StaticObject(480, 300, 580, 310));
-        staticObjectsList.add(new StaticObject(350, 150, 450, 160));
+
         MovingObject.setStaticObjectsList(staticObjectsList);
 
 
         thread = new Thread(this);
 
         rObj = new MovingObject(0,10,30);
-        rObj.setxCord(395);
-        rObj.setyCord(400);
+        rObj.setxCord(frameWidth/2);
+        rObj.setyCord(frameHeight/2 - 400);
+
+        posThread = new Thread(() -> {
+            while(running) {
+                rObj.checkIfInFrame();
+                try {
+                    Thread.sleep(1000/500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                rObj.calculatePosition();
+
+                rObj.checkIfInFrame();
+            }
+        } );
 
         start();
     }
@@ -53,6 +66,27 @@ public class GamePanel extends JPanel implements Runnable {
         Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), Math.floor(rObj.getyCord()),
                 rObj.getWidth(), rObj.getHeight());
         g2.fill(rect);
+        g2.draw(rect);
+
+
+        if(editMode) {
+            g2.setPaint(Color.GREEN);
+            staticObjectsCollision = false;
+            if (getMousePosition() != null) {
+                Rectangle2D ghostRect = new Rectangle2D.Double(getMousePosition().x - 50, getMousePosition().y - 5, 100, 10);
+
+                loop1:
+                for (StaticObject a : staticObjectsList) {
+                    if (getMousePosition().x + 50 >= a.getX1() && getMousePosition().x - 50 <= a.getX2() &&
+                            getMousePosition().y + 5 >= a.getY1() && getMousePosition().y - 5 <= a.getY2()) {
+                        staticObjectsCollision = true;
+                        g2.setPaint(Color.RED);
+                    }
+                }
+                g2.fill(ghostRect);
+                g2.draw(ghostRect);
+            }
+        }
     }
 
     @Override
@@ -63,22 +97,13 @@ public class GamePanel extends JPanel implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            count++;
-            if(count%fps == 0) {
-                timeInSeconds++;
-                System.out.print( "\r" + timeInSeconds);
-            }
-
-            time++;
-            rObj.setTime(time);
-            rObj.calculatePosition();
 
             if(lastMove == 1 && lastMove != 11) {
-                rObj.setxCord(rObj.getxCord()+10);
+                rObj.setxCord(rObj.getxCord() + 600/fps);
                 rObj.checkIfInFrame();
             }
             else if(lastMove == 2 && lastMove != 12) {
-                rObj.setxCord(rObj.getxCord()-10);
+                rObj.setxCord(rObj.getxCord() - 600/fps);
                 rObj.checkIfInFrame();
             }
 
@@ -90,6 +115,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void start() {
         running = true;
         thread.start();
+        posThread.start();
     }
 
     public  void stop() {
@@ -106,11 +132,29 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void keyPressed(KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+        if(e.getKeyCode() == KeyEvent.VK_F1) {
+            if(editMode) {
+                editMode = false;
+            }
+            else {
+                editMode = true;
+            }
+        }
 
+        if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            controlPressed = true;
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_Z) {
+            if(controlPressed && editMode && staticObjectsList.size() > 1) {
+                staticObjectsList.remove(staticObjectsList.size()-1);
+            }
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_UP) {
             for(StaticObject s : staticObjectsList) {
                 if(rObj.getxCord() >= s.getX1() - rObj.getWidth() && rObj.getxCord() <= s.getX2()){
-                    if(rObj.getyCord() + rObj.getHeight() >= s.getY1() &&
+                    if(rObj.getyCord() + rObj.getHeight() >= s.getY1() - 1 &&
                             rObj.getyCord() + rObj.getHeight() < s.getY1() + rObj.getySpeed()/fps + 1) {
                         onGround = true;
                     }
@@ -140,5 +184,31 @@ public class GamePanel extends JPanel implements Runnable {
                 lastMove = 12;
             }
         }
+        if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            controlPressed = false;
+        }
+    }
+
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    public void mousePressed(MouseEvent e) {
+        if (!staticObjectsCollision && editMode) {
+            staticObjectsList.add(new StaticObject(getMousePosition().x - 50, getMousePosition().y - 5,
+                    getMousePosition().x + 50, getMousePosition().y + 5));
+        }
+    }
+
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    public void mouseExited(MouseEvent e) {
+
     }
 }

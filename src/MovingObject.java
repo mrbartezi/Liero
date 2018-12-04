@@ -14,7 +14,7 @@ public class MovingObject {
     private double xAcc = 0.0;
     private double yAcc = 0.0;
     private int time = 0;
-    private int fps = 60;
+    private static int fps = 500;
     private static ArrayList<StaticObject> staticObjectsList;
 
     public MovingObject(int id, int width, int height) {
@@ -60,23 +60,23 @@ public class MovingObject {
         }
 
         for(StaticObject s : staticObjectsList) {
-            if(xCord > s.getX1() - width && xCord < s.getX2()){
-                if(yCord + height >= s.getY1() && yCord + height < s.getY1() + ySpeed/fps + 1) {
-                    yCord = s.getY1() - height;
+            if (xCord > s.getX1() - width && xCord < s.getX2()) {
+                if (yCord + height >= s.getY1() && yCord + height < s.getY1() + ySpeed / fps + 1) {
+                    yCord = s.getY1() - height - 1;
                     ySpeed = 0;
                 }
 
-                if(yCord <= s.getY2() && yCord >= s.getY2() + ySpeed/fps - 1) {
+                if (yCord <= s.getY2() && yCord >= s.getY2() + ySpeed / fps - 1) {
                     yCord = s.getY2();
                     ySpeed = 0;
                 }
             }
 
-            if(yCord + height >= s.getY1() + ySpeed/fps + 1 && yCord <= s.getY2()) {
-                if(xCord + width >= s.getX1() && xCord + width <= s.getX1()+10) {
-                    xCord = s.getX1() - width;
+            if (yCord + height >= s.getY1() + ySpeed / fps + 1 && yCord <= s.getY2()) {
+                if (xCord + width >= s.getX1() && xCord + width <= s.getX1() + 5) {
+                    xCord = s.getX1() - width - 1;
                 }
-                if(xCord  <= s.getX2() && xCord >= s.getX2() - 10) {
+                if (xCord <= s.getX2() && xCord >= s.getX2() - 5) {
                     xCord = s.getX2();
                 }
             }
@@ -119,8 +119,8 @@ public class MovingObject {
         this.time = time;
     }
 
-    public void setFps(int fps) {
-        this.fps = fps;
+    public static void setFps(int fps1) {
+        fps = fps1;
     }
 
     public int getId() {

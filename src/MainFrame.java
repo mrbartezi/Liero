@@ -2,11 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class MainFrame extends JFrame implements KeyListener {
+public class MainFrame extends JFrame implements KeyListener, MouseListener {
 
     private GamePanel gamePanel;
-    private int frameWidth = 800, frameHeight = 600;
+    private int frameWidth = 1600, frameHeight = 900;
 
     public MainFrame() {
 
@@ -18,8 +20,11 @@ public class MainFrame extends JFrame implements KeyListener {
         setVisible(true);
         setResizable(false);
         setLayout(new BorderLayout());
+
         addKeyListener(this);
         setFocusable(true);
+
+        addMouseListener(this);
 
         MovingObject.setFrameWidth(frameWidth);
         MovingObject.setFrameHeight(frameHeight);
@@ -50,5 +55,30 @@ public class MainFrame extends JFrame implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         gamePanel.keyReleased(e);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        gamePanel.mouseClicked(e);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        gamePanel.mousePressed(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        gamePanel.mouseReleased(e);
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        gamePanel.mouseEntered(e);
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        gamePanel.mouseExited(e);
     }
 }
