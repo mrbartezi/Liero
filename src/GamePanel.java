@@ -34,7 +34,7 @@ public class GamePanel extends JPanel implements Runnable {
         thread = new Thread(this);
 
         rObj = new MovingObject(0,10,30);
-        rObj.setxCord(375);
+        rObj.setxCord(395);
         rObj.setyCord(400);
 
         start();
