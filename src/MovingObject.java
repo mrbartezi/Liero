@@ -14,7 +14,7 @@ public class MovingObject {
     private double xAcc = 0.0;
     private double yAcc = 0.0;
     private int time = 0;
-    private static int fps = 500;
+    private static int fps = 120;
     private static ArrayList<StaticObject> staticObjectsList;
 
     public MovingObject(int id, int width, int height) {

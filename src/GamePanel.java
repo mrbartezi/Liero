@@ -8,17 +8,18 @@ import java.util.ArrayList;
 public class GamePanel extends JPanel implements Runnable {
 
     private MovingObject rObj;
-    private Thread thread, posThread;
+    private Thread thread;
     private boolean running, onGround, staticObjectsCollision = false,
-            editMode = true, controlPressed = false;
+            editMode = true, controlPressed = false, mousePressed = false;
     private int time = 0, timeInSeconds = 0;
-    private static int fps = 120;
+    private static int fps = 60;
     private int lastMove = 0;
     private ArrayList<StaticObject> staticObjectsList;
 
 
 
     public GamePanel(int frameWidth, int frameHeight) {
+        MovingObject.setFps(fps);
 
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
@@ -36,20 +37,6 @@ public class GamePanel extends JPanel implements Runnable {
         rObj.setxCord(frameWidth/2);
         rObj.setyCord(frameHeight/2 - 400);
 
-        posThread = new Thread(() -> {
-            while(running) {
-                rObj.checkIfInFrame();
-                try {
-                    Thread.sleep(1000/500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                rObj.calculatePosition();
-
-                rObj.checkIfInFrame();
-            }
-        } );
-
         start();
     }
 
@@ -60,10 +47,11 @@ public class GamePanel extends JPanel implements Runnable {
         g2.setPaint(Color.WHITE);
         for(StaticObject s : staticObjectsList) {
             g2.fill(new Rectangle2D.Double(s.getX1(), s.getY1(), s.getX2() - s.getX1(), s.getY2() - s.getY1()));
+            g2.draw(new Rectangle2D.Double(s.getX1(), s.getY1(), s.getX2() - s.getX1(), s.getY2() - s.getY1()));
         }
 
         g2.setPaint(Color.RED);
-        Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), Math.floor(rObj.getyCord()),
+        Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), rObj.getyCord(),
                 rObj.getWidth(), rObj.getHeight());
         g2.fill(rect);
         g2.draw(rect);
@@ -92,6 +80,7 @@ public class GamePanel extends JPanel implements Runnable {
     @Override
     public void run() {
         while (running) {
+            rObj.checkIfInFrame();
             try {
                 Thread.sleep(1000/fps);
             } catch (InterruptedException e) {
@@ -107,15 +96,16 @@ public class GamePanel extends JPanel implements Runnable {
                 rObj.checkIfInFrame();
             }
 
-            repaint();
+            rObj.calculatePosition();
 
+            rObj.checkIfInFrame();
+            repaint();
         }
     }
 
     public void start() {
         running = true;
         thread.start();
-        posThread.start();
     }
 
     public  void stop() {
@@ -171,6 +161,10 @@ public class GamePanel extends JPanel implements Runnable {
         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
             lastMove = 2;
         }
+
+        if(e.getKeyCode() == KeyEvent.VK_E) {
+            System.out.println(staticObjectsList.size());
+        }
     }
 
     public void keyReleased(KeyEvent e) {
@@ -194,6 +188,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void mousePressed(MouseEvent e) {
+        mousePressed = true;
         if (!staticObjectsCollision && editMode) {
             staticObjectsList.add(new StaticObject(getMousePosition().x - 50, getMousePosition().y - 5,
                     getMousePosition().x + 50, getMousePosition().y + 5));
@@ -201,6 +196,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void mouseReleased(MouseEvent e) {
+        mousePressed = false;
 
     }
 
