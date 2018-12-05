@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class MovingObject {
     private static int frameWidth;
     private static int frameHeight;
@@ -13,9 +11,7 @@ public class MovingObject {
     private double gravAcc = 2500.0;
     private double xAcc = 0.0;
     private double yAcc = 0.0;
-    private int time = 0;
     private static int fps = 120;
-    private static ArrayList<StaticObject> staticObjectsList;
     private static int[][] pixels;
 
     public MovingObject(int id, int width, int height) {
@@ -42,10 +38,12 @@ public class MovingObject {
                 }
                 if(i%10 == 0) {
                     for(int j = (int)yCord; j < (int)yCord + height; j++) {
-                        if(pixels[(int)xCord ][j] == 1) {
-                            xCord += 1;
-                            xSpeed = 0;
-                            break loop1;
+                        if(pixels != null) {
+                            if (pixels[(int) xCord][j] == 1) {
+                                xCord += 1;
+                                xSpeed = 0;
+                                break loop1;
+                            }
                         }
                     }
                 }
@@ -59,10 +57,12 @@ public class MovingObject {
                 }
                 if(i%10 == 0) {
                     for(int j = (int)yCord; j < (int)yCord + height; j++) {
-                        if(pixels[(int)xCord + width][j] == 1) {
-                            xCord -= 1;
-                            xSpeed = 0;
-                            break loop2;
+                        if(pixels != null) {
+                            if (pixels[(int) xCord + width][j] == 1) {
+                                xCord -= 1;
+                                xSpeed = 0;
+                                break loop2;
+                            }
                         }
                     }
                 }
@@ -79,10 +79,12 @@ public class MovingObject {
                 }
                 if(i%10 == 0) {
                     for(int j = (int)xCord; j < xCord + width; j++) {
-                        if(pixels[j][(int)yCord] == 1) {
-                            yCord += 1;
-                            ySpeed = 0;
-                            break loop3;
+                        if(pixels != null) {
+                            if (pixels[j][(int) yCord] == 1) {
+                                yCord += 1;
+                                ySpeed = 0;
+                                break loop3;
+                            }
                         }
                     }
                 }
@@ -110,36 +112,6 @@ public class MovingObject {
         else {
             ySpeed = 0;
         }
-        checkIfInFrame();
-    }
-
-    public void checkIfInFrame() {
-        pixels = StaticObject.getPixels();
-
-        if(yCord < 0) {
-            yCord = 0;
-            ySpeed = 0;
-        }
-
-        if (yCord > frameHeight - height) {
-            yCord = frameHeight - height;
-        }
-
-        if(xCord <= 0) {
-            xCord = 0;
-        }
-
-        if(xCord >= frameWidth - width) {
-            xCord = frameWidth - width;
-        }
-    }
-
-    public ArrayList<StaticObject> getStaticObjectsList() {
-        return staticObjectsList;
-    }
-
-    public static void setStaticObjectsList(ArrayList<StaticObject> List) {
-        staticObjectsList = List;
     }
 
     public int getWidth() {
@@ -164,10 +136,6 @@ public class MovingObject {
 
     public void setyAcc(double yAcc) {
         this.yAcc = yAcc;
-    }
-
-    public void setTime(int time) {
-        this.time = time;
     }
 
     public static void setFps(int fps1) {
@@ -224,5 +192,13 @@ public class MovingObject {
 
     public void setGravAcc(double gravAcc) {
         this.gravAcc = gravAcc;
+    }
+
+    public static int[][] getPixels() {
+        return pixels;
+    }
+
+    public static void setPixels(int[][] pixels) {
+        MovingObject.pixels = pixels;
     }
 }
