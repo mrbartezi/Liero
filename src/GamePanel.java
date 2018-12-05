@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -12,14 +13,30 @@ public class GamePanel extends JPanel implements Runnable {
     private boolean running, onGround, staticObjectsCollision = false,
             editMode = true, controlPressed = false, mousePressed = false;
     private int time = 0, timeInSeconds = 0;
-    private static int fps = 60;
+    private static int fps = 120;
     private int lastMove = 0;
     private ArrayList<StaticObject> staticObjectsList;
-
+    private int frameWidth, frameHeight;
+    private int[][] pixels;
+    private BufferedImage image;
 
 
     public GamePanel(int frameWidth, int frameHeight) {
+        pixels = new int[frameWidth][frameHeight];
+        for(int i = 0; i < frameWidth; i++) {
+            for(int j = 0; j < frameHeight; j++) {
+                pixels[i][j] = 0;
+            }
+        }
+
         MovingObject.setFps(fps);
+        StaticObject.setPixels(pixels);
+        this.frameWidth = frameWidth;
+        this.frameHeight = frameHeight;
+
+        image = new BufferedImage(frameWidth, frameHeight, BufferedImage.TYPE_INT_RGB);
+
+        StaticObject.setImage(image);
 
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
@@ -43,12 +60,21 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        this.pixels = StaticObject.getPixels();
 
+
+        /*
         g2.setPaint(Color.WHITE);
-        for(StaticObject s : staticObjectsList) {
-            g2.fill(new Rectangle2D.Double(s.getX1(), s.getY1(), s.getX2() - s.getX1(), s.getY2() - s.getY1()));
-            g2.draw(new Rectangle2D.Double(s.getX1(), s.getY1(), s.getX2() - s.getX1(), s.getY2() - s.getY1()));
+        for(int i = 0; i < frameWidth; i++) {
+            for(int j = 0; j < frameHeight; j++) {
+                if(pixels[i][j] == 1) {
+                    g2.draw(new Rectangle2D.Double(i, j, 1, 1));
+                }
+            }
         }
+        */
+
+        g2.drawImage(StaticObject.getImage(), 0, 0, null);
 
         g2.setPaint(Color.RED);
         Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), rObj.getyCord(),
@@ -63,6 +89,8 @@ public class GamePanel extends JPanel implements Runnable {
             if (getMousePosition() != null) {
                 Rectangle2D ghostRect = new Rectangle2D.Double(getMousePosition().x - 50, getMousePosition().y - 5, 100, 10);
 
+
+                /*
                 loop1:
                 for (StaticObject a : staticObjectsList) {
                     if (getMousePosition().x + 50 >= a.getX1() && getMousePosition().x - 50 <= a.getX2() &&
@@ -71,6 +99,7 @@ public class GamePanel extends JPanel implements Runnable {
                         g2.setPaint(Color.RED);
                     }
                 }
+                */
                 g2.fill(ghostRect);
                 g2.draw(ghostRect);
             }
@@ -88,15 +117,41 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             if(lastMove == 1 && lastMove != 11) {
-                rObj.setxCord(rObj.getxCord() + 600/fps);
+                rObj.setxSpeed(1000);
                 rObj.checkIfInFrame();
             }
             else if(lastMove == 2 && lastMove != 12) {
-                rObj.setxCord(rObj.getxCord() - 600/fps);
+                rObj.setxSpeed(-1000);
                 rObj.checkIfInFrame();
             }
 
             rObj.calculatePosition();
+
+            if (mousePressed && !staticObjectsCollision && editMode) {
+                int x1 = getMousePosition().x - 50;
+                int y1 = getMousePosition().y - 5;
+                int x2 = getMousePosition().x + 50;
+                int y2 = getMousePosition().y + 5;
+
+                for (int i = x1; i < x2; i++) {
+                    for (int j = y1; j < y2; j++) {
+                        pixels[i][j] = 1;
+                    }
+                }
+                int alpha = 255;
+                int red = 255;
+                int green = 255;
+                int blue = 255;
+                int p = (alpha<<24) | (red<<16) | (green<<8) | blue;
+
+                for(int i = 0; i < frameWidth; i++) {
+                    for(int j = 0; j < frameHeight; j++) {
+                        if(pixels[i][j] == 1) {
+                            image.setRGB(i, j, p);
+                        }
+                    }
+                }
+            }
 
             rObj.checkIfInFrame();
             repaint();
@@ -142,6 +197,8 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if(e.getKeyCode() == KeyEvent.VK_UP) {
+            onGround = true;
+            /*
             for(StaticObject s : staticObjectsList) {
                 if(rObj.getxCord() >= s.getX1() - rObj.getWidth() && rObj.getxCord() <= s.getX2()){
                     if(rObj.getyCord() + rObj.getHeight() >= s.getY1() - 1 &&
@@ -150,6 +207,7 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                 }
             }
+            */
             if(onGround) {
                 rObj.setySpeed(-1000);
                 onGround = false;
@@ -163,6 +221,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if(e.getKeyCode() == KeyEvent.VK_E) {
+            System.out.println(rObj.getxCord() + " : " + rObj.getyCord() + " : " + rObj.getySpeed());
             System.out.println(staticObjectsList.size());
         }
     }
@@ -189,10 +248,12 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void mousePressed(MouseEvent e) {
         mousePressed = true;
+        /*
         if (!staticObjectsCollision && editMode) {
             staticObjectsList.add(new StaticObject(getMousePosition().x - 50, getMousePosition().y - 5,
                     getMousePosition().x + 50, getMousePosition().y + 5));
         }
+        */
     }
 
     public void mouseReleased(MouseEvent e) {
@@ -206,5 +267,17 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public void setPixels(int[][] pixels) {
+        this.pixels = pixels;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
     }
 }

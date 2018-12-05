@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MovingObject {
     private static int frameWidth;
@@ -16,6 +17,8 @@ public class MovingObject {
     private int time = 0;
     private static int fps = 120;
     private static ArrayList<StaticObject> staticObjectsList;
+    private static int[][] pixels;
+    private boolean changePosVer;
 
     public MovingObject(int id, int width, int height) {
         this.id = id;
@@ -26,10 +29,10 @@ public class MovingObject {
     public void calculatePosition() {
 
         // Air resistance
-        /*
-        xAcc = -1/2 * xSpeed;
-        yAcc = -1/2 * ySpeed;
-        */
+
+        xAcc =  -30*xSpeed;
+        //yAcc = -1/2 * ySpeed;
+
 
         xSpeed += xAcc / fps;
         ySpeed += gravAcc / fps + yAcc / fps;
@@ -41,6 +44,7 @@ public class MovingObject {
     }
 
     public void checkIfInFrame() {
+        pixels = StaticObject.getPixels();
 
         if(yCord < 0) {
             yCord = 0;
@@ -58,7 +62,76 @@ public class MovingObject {
         if(xCord >= frameWidth - width) {
             xCord = frameWidth - width;
         }
+        changePosVer = false;
 
+        //Checking if static object is under moving object.
+        int yBounds = (int)(yCord + height + ySpeed / fps + 1);
+        if((int)(yCord + height + ySpeed / fps + 1) > frameHeight) {
+            yBounds = frameHeight;
+        }
+
+        for(int i = (int)xCord; i < xCord + width; i++) {
+            for(int j = (int)yCord + height; j < yBounds; j++) {
+                if(pixels[i][j] == 1) {
+                    yCord = j - height - 1;
+                    ySpeed = 0;
+                    changePosVer = true;
+                }
+            }
+        }
+
+        //Checking if static object is over moving object.
+        yBounds = (int)(yCord + ySpeed/fps - 1);
+        if((int)(yCord + ySpeed/fps - 1) < 0) {
+            yBounds = 0;
+        }
+
+        for(int i = (int)xCord; i < xCord + width; i++) {
+            for(int j =(int)yCord; j > yBounds; j--) {
+                if(pixels[i][j] == 1) {
+                    yCord = j + 1;
+                    ySpeed = 0;
+                    changePosVer = true;
+                }
+            }
+        }
+
+        //Checking if static object is on the right of the moving object.
+        if(!changePosVer) {
+            int xBounds = (int) (xCord + width + xSpeed / fps + 1);
+            if ((int) (xCord + width + xSpeed / fps + 1) > frameWidth) {
+                xBounds = frameWidth;
+            }
+
+            for (int j = (int) yCord; j < yCord + height; j++) {
+                for (int i = xBounds; i > (int) xCord + width; i--) {
+                    if (pixels[i][j] == 1) {
+                        xCord = i - width - 2;
+                        xSpeed = 0;
+                    }
+                }
+            }
+
+            //Checking if static object is on the left of the moving object.
+
+            xBounds = (int) (xCord + xSpeed / fps - 1);
+            if ((int) (xCord + xSpeed / fps - 1) < 0) {
+                xBounds = 0;
+            }
+
+            for (int j = (int) yCord; j < yCord + height; j++) {
+                for (int i = xBounds; i < xCord; i++) {
+                    if (pixels[i][j] == 1) {
+                        xCord = i + 2;
+                        xSpeed = 0;
+                    }
+                }
+            }
+        }
+
+
+
+        /*
         for(StaticObject s : staticObjectsList) {
             if (xCord > s.getX1() - width && xCord < s.getX2()) {
                 if (yCord + height >= s.getY1() && yCord + height < s.getY1() + ySpeed / fps + 1) {
@@ -81,6 +154,7 @@ public class MovingObject {
                 }
             }
         }
+        */
     }
 
     public ArrayList<StaticObject> getStaticObjectsList() {
