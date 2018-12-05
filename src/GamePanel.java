@@ -33,26 +33,21 @@ public class GamePanel extends JPanel implements Runnable {
         StaticObject.setPixels(pixels);
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
-
         image = new BufferedImage(frameWidth, frameHeight, BufferedImage.TYPE_INT_RGB);
-
         StaticObject.setImage(image);
+
+        MovingObject.setStaticObjectsList(staticObjectsList);
 
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
-
-        staticObjectsList = new ArrayList<>();
-        staticObjectsList.add(new StaticObject(0, frameHeight, frameWidth, frameHeight));
-
-        MovingObject.setStaticObjectsList(staticObjectsList);
 
 
         thread = new Thread(this);
 
         rObj = new MovingObject(0,10,30);
         rObj.setxCord(frameWidth/2);
-        rObj.setyCord(frameHeight/2 - 400);
+        rObj.setyCord(frameHeight/2);
 
         start();
     }
@@ -60,21 +55,8 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        this.pixels = StaticObject.getPixels();
 
-
-        /*
-        g2.setPaint(Color.WHITE);
-        for(int i = 0; i < frameWidth; i++) {
-            for(int j = 0; j < frameHeight; j++) {
-                if(pixels[i][j] == 1) {
-                    g2.draw(new Rectangle2D.Double(i, j, 1, 1));
-                }
-            }
-        }
-        */
-
-        g2.drawImage(StaticObject.getImage(), 0, 0, null);
+        g2.drawImage(image, 0, 0, null);
 
         g2.setPaint(Color.RED);
         Rectangle2D rect = new Rectangle2D.Double(rObj.getxCord(), rObj.getyCord(),
@@ -88,18 +70,6 @@ public class GamePanel extends JPanel implements Runnable {
             staticObjectsCollision = false;
             if (getMousePosition() != null) {
                 Rectangle2D ghostRect = new Rectangle2D.Double(getMousePosition().x - 50, getMousePosition().y - 5, 100, 10);
-
-
-                /*
-                loop1:
-                for (StaticObject a : staticObjectsList) {
-                    if (getMousePosition().x + 50 >= a.getX1() && getMousePosition().x - 50 <= a.getX2() &&
-                            getMousePosition().y + 5 >= a.getY1() && getMousePosition().y - 5 <= a.getY2()) {
-                        staticObjectsCollision = true;
-                        g2.setPaint(Color.RED);
-                    }
-                }
-                */
                 g2.fill(ghostRect);
                 g2.draw(ghostRect);
             }
@@ -109,7 +79,6 @@ public class GamePanel extends JPanel implements Runnable {
     @Override
     public void run() {
         while (running) {
-            rObj.checkIfInFrame();
             try {
                 Thread.sleep(1000/fps);
             } catch (InterruptedException e) {
@@ -152,8 +121,6 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                 }
             }
-
-            rObj.checkIfInFrame();
             repaint();
         }
     }
@@ -198,16 +165,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         if(e.getKeyCode() == KeyEvent.VK_UP) {
             onGround = true;
-            /*
-            for(StaticObject s : staticObjectsList) {
-                if(rObj.getxCord() >= s.getX1() - rObj.getWidth() && rObj.getxCord() <= s.getX2()){
-                    if(rObj.getyCord() + rObj.getHeight() >= s.getY1() - 1 &&
-                            rObj.getyCord() + rObj.getHeight() < s.getY1() + rObj.getySpeed()/fps + 1) {
-                        onGround = true;
-                    }
-                }
-            }
-            */
+
             if(onGround) {
                 rObj.setySpeed(-1000);
                 onGround = false;
@@ -248,12 +206,6 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void mousePressed(MouseEvent e) {
         mousePressed = true;
-        /*
-        if (!staticObjectsCollision && editMode) {
-            staticObjectsList.add(new StaticObject(getMousePosition().x - 50, getMousePosition().y - 5,
-                    getMousePosition().x + 50, getMousePosition().y + 5));
-        }
-        */
     }
 
     public void mouseReleased(MouseEvent e) {
