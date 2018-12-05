@@ -1,0 +1,15 @@
+ESC = reset program
+
+UP = jump
+RIGHT = move right
+LEFT = move left
+
+F1 = turn on/off edit mode
+
+EDIT MODE:
+Mouse click = create new block
+Numpad 6 = increase block width
+Numpad 4 = decrease block width
+Numpad 8 = increase block height
+Numpad 2 = decrease block height
+Numpad 5 = rotate block

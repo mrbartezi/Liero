@@ -28,8 +28,6 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener {
 
         MovingObject.setFrameWidth(frameWidth);
         MovingObject.setFrameHeight(frameHeight);
-        StaticObject.setFrameWidth(frameWidth);
-        StaticObject.setFrameHeight(frameHeight);
 
         gamePanel = new GamePanel(frameWidth, frameHeight);
 
