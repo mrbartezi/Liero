@@ -1,3 +1,4 @@
+ESC = exit program
 ESC = reset program
 
 SPACE = jump

@@ -34,7 +34,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.frameHeight = frameHeight;
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
-        setBackground(Color.BLUE);
+        setBackground(Color.BLACK);
 
         pixels = new int[frameWidth][frameHeight];
         for(int i = 0; i < frameWidth; i++) {
@@ -70,6 +70,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         g2.drawImage(image, 0, 0, null);
 
+        //MOVING OBJECTS
         try {
             for (MovingObject m : movingObjects) {
                 if (m.getId() == -1) {
@@ -80,7 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
                             g2.setPaint(Color.DARK_GRAY);
                             break;
                         case 1:
-                            g2.setPaint(Color.RED);
+                            g2.setPaint(Color.WHITE);
                             break;
                     }
                     Rectangle2D rect = new Rectangle2D.Double(m.getxCord(), m.getyCord(),
@@ -135,6 +136,8 @@ public class GamePanel extends JPanel implements Runnable {
                 g2.draw(ghostRect);
             }
         }
+
+        //FPS COUNTER
         g2.setPaint(Color.YELLOW);
         g2.drawString(FPS + " " , 0,10);
     }
@@ -156,10 +159,10 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             if(lastMove == 1 && lastMove != 11) {
-                player.setxSpeed(1000);
+                player.setxSpeed(500);
             }
             else if(lastMove == 2 && lastMove != 12) {
-                player.setxSpeed(-1000);
+                player.setxSpeed(-500);
             }
 
             try {
@@ -332,10 +335,14 @@ public class GamePanel extends JPanel implements Runnable {
         blockWidth = EditMode.getWidth();
         blockHeight = EditMode.getHeight();
 
-        x1 = getMousePosition().x - blockWidth/2;
-        y1 = getMousePosition().y - blockHeight/2;
-        x2 = getMousePosition().x + blockWidth/2;
-        y2 = getMousePosition().y + blockHeight/2;
+        try {
+            x1 = getMousePosition().x - blockWidth / 2;
+            y1 = getMousePosition().y - blockHeight / 2;
+            x2 = getMousePosition().x + blockWidth / 2;
+            y2 = getMousePosition().y + blockHeight / 2;
+        }catch (Exception e){
+
+        }
 
         EditMode.blockList.add(new Rectangle2D.Double(x1 + blockWidth/2, y1 + blockHeight/2, blockWidth, blockHeight));
 

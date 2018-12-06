@@ -152,8 +152,25 @@ public class MovingObject {
                         for (int j = (int) yCord; j < (int) yCord + height; j++) {
                             if (pixels != null) {
                                 if (pixels[(int) xCord][j] == 1) {
-                                    for(int k = (int)yCord - weaponPower; k < yCord + height + weaponPower; k++) {
-                                        for(int l = (int)xCord - weaponPower; l < xCord + width + weaponPower; l++) {
+
+                                    int kDownBound =(int)yCord - weaponPower;
+                                    if(kDownBound < 0) {
+                                        kDownBound = 0;
+                                    }
+                                    double kUpBound = yCord + height + weaponPower;
+                                    if(kUpBound > frameHeight) {
+                                        kUpBound = frameHeight;
+                                    }
+                                    int lDownBound = (int)xCord - weaponPower;
+                                    if(lDownBound < 0) {
+                                        lDownBound = 0;
+                                    }
+                                    double lUpBound = xCord + width + weaponPower;
+                                    if(lUpBound > frameWidth){
+                                        lUpBound = frameWidth;
+                                    }
+                                    for(int k = kDownBound; k < kUpBound; k++) {
+                                        for(int l = lDownBound; l < lUpBound; l++) {
                                             pixels[l][k] = 0;
                                             image.setRGB(l, k, (255<<24) | (60<<16) | (50<<8) | 40);
                                         }
@@ -178,8 +195,24 @@ public class MovingObject {
                         for (int j = (int) yCord; j < (int) yCord + height; j++) {
                             if (pixels != null) {
                                 if (pixels[(int) xCord + width][j] == 1) {
-                                    for(int k = (int)yCord - weaponPower; k < yCord + height + weaponPower; k++) {
-                                        for(int l = (int) xCord - weaponPower; l < xCord + width + weaponPower; l++) {
+                                    int kDownBound =(int)yCord - weaponPower;
+                                    if(kDownBound < 0) {
+                                        kDownBound = 0;
+                                    }
+                                    double kUpBound = yCord + height + weaponPower;
+                                    if(kUpBound > frameHeight) {
+                                        kUpBound = frameHeight;
+                                    }
+                                    int lDownBound = (int) xCord - weaponPower;
+                                    if(lDownBound < 0) {
+                                        lDownBound = 0;
+                                    }
+                                    double lUpBound = xCord + width + weaponPower;
+                                    if(lUpBound > frameWidth){
+                                        lUpBound = frameWidth;
+                                    }
+                                    for(int k = kDownBound; k < kUpBound; k++) {
+                                        for(int l = lDownBound; l < lUpBound; l++) {
                                             pixels[l][k] = 0;
                                             image.setRGB(l, k,(255<<24) | (60<<16) | (50<<8) | 40);
                                         }
@@ -207,8 +240,24 @@ public class MovingObject {
                         for (int j = (int) xCord; j < xCord + width; j++) {
                             if (pixels != null) {
                                 if (pixels[j][(int) yCord] == 1) {
-                                    for(int k = (int) xCord - weaponPower; k < xCord + width + weaponPower; k++) {
-                                        for(int l = (int)yCord - weaponPower; l < yCord + height + weaponPower; l++) {
+                                    int kDownBound =(int) xCord - weaponPower;
+                                    if(kDownBound < 0) {
+                                        kDownBound = 0;
+                                    }
+                                    double kUpBound = xCord + width + weaponPower;
+                                    if(kUpBound > frameWidth) {
+                                        kUpBound = frameWidth;
+                                    }
+                                    int lDownBound = (int)yCord - weaponPower;
+                                    if(lDownBound < 0) {
+                                        lDownBound = 0;
+                                    }
+                                    double lUpBound = yCord + height + weaponPower;
+                                    if(lUpBound > frameHeight){
+                                        lUpBound = frameHeight;
+                                    }
+                                    for(int k = kDownBound; k < kUpBound; k++) {
+                                        for(int l = lDownBound; l < lUpBound; l++) {
                                             pixels[k][l] = 0;
                                             image.setRGB(k, l,(255<<24) | (60<<16) | (50<<8) | 40);
                                         }
@@ -234,8 +283,24 @@ public class MovingObject {
                         for (int j = (int) xCord; j < xCord + width; j++) {
                             if (pixels != null) {
                                 if (pixels[j][(int) yCord + height] == 1) {
-                                    for(int k = (int) xCord - weaponPower; k < xCord + width + weaponPower; k++) {
-                                        for(int l = (int) yCord - weaponPower; l < yCord + height + weaponPower; l++) {
+                                    int kDownBound =(int) xCord - weaponPower;
+                                    if(kDownBound < 0) {
+                                        kDownBound = 0;
+                                    }
+                                    double kUpBound = xCord + width + weaponPower;
+                                    if(kUpBound > frameWidth) {
+                                        kUpBound = frameWidth;
+                                    }
+                                    int lDownBound = (int)yCord - weaponPower;
+                                    if(lDownBound < 0) {
+                                        lDownBound = 0;
+                                    }
+                                    double lUpBound = yCord + height + weaponPower;
+                                    if(lUpBound > frameHeight){
+                                        lUpBound = frameHeight;
+                                    }
+                                    for(int k = kDownBound; k < kUpBound; k++) {
+                                        for(int l = lDownBound; l < lUpBound; l++) {
                                             pixels[k][l] = 0;
                                             image.setRGB(k, l,(255<<24) | (60<<16) | (50<<8) | 40);
                                         }
