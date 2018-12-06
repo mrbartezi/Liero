@@ -16,6 +16,7 @@ public class MovingObject {
     private static int fps = 120;
     private static int[][] pixels;
     private static BufferedImage image;
+    private int weaponPower = 0;
 
     public MovingObject(int id, int width, int height) {
         this.id = id;
@@ -137,7 +138,7 @@ public class MovingObject {
             }
         }
         //////
-        if(id == 1) {
+        if(id >= 1 && id < 100) {
             if (xSpeed < -1) {
                 loop1:
                 for (int i = 0; i > xSpeed / fps * 10; i--) {
@@ -151,10 +152,10 @@ public class MovingObject {
                         for (int j = (int) yCord; j < (int) yCord + height; j++) {
                             if (pixels != null) {
                                 if (pixels[(int) xCord][j] == 1) {
-                                    for(int k = (int)yCord; k < yCord + height; k++) {
-                                        for(int l = (int)xCord; l < xCord + width; l++) {
+                                    for(int k = (int)yCord - weaponPower; k < yCord + height + weaponPower; k++) {
+                                        for(int l = (int)xCord - weaponPower; l < xCord + width + weaponPower; l++) {
                                             pixels[l][k] = 0;
-                                            image.setRGB(l, k, (255 << 24) | (0 << 16) | (0 << 8) | 0);
+                                            image.setRGB(l, k, (255<<24) | (60<<16) | (50<<8) | 40);
                                         }
                                     }
                                     id = -1;
@@ -177,10 +178,10 @@ public class MovingObject {
                         for (int j = (int) yCord; j < (int) yCord + height; j++) {
                             if (pixels != null) {
                                 if (pixels[(int) xCord + width][j] == 1) {
-                                    for(int k = (int) yCord; k < yCord + height; k++) {
-                                        for(int l = (int) xCord; l < xCord + width; l++) {
+                                    for(int k = (int)yCord - weaponPower; k < yCord + height + weaponPower; k++) {
+                                        for(int l = (int) xCord - weaponPower; l < xCord + width + weaponPower; l++) {
                                             pixels[l][k] = 0;
-                                            image.setRGB(l, k,(255<<24) | (0<<16) | (0<<8) | 0);
+                                            image.setRGB(l, k,(255<<24) | (60<<16) | (50<<8) | 40);
                                         }
                                     }
                                     id = -1;
@@ -206,10 +207,10 @@ public class MovingObject {
                         for (int j = (int) xCord; j < xCord + width; j++) {
                             if (pixels != null) {
                                 if (pixels[j][(int) yCord] == 1) {
-                                    for(int k = (int) xCord; k < xCord + width; k++) {
-                                        for(int l = (int)yCord; l < yCord + height; l++) {
+                                    for(int k = (int) xCord - weaponPower; k < xCord + width + weaponPower; k++) {
+                                        for(int l = (int)yCord - weaponPower; l < yCord + height + weaponPower; l++) {
                                             pixels[k][l] = 0;
-                                            image.setRGB(k, l,(255<<24) | (0<<16) | (0<<8) | 0);
+                                            image.setRGB(k, l,(255<<24) | (60<<16) | (50<<8) | 40);
                                         }
                                     }
 
@@ -233,10 +234,10 @@ public class MovingObject {
                         for (int j = (int) xCord; j < xCord + width; j++) {
                             if (pixels != null) {
                                 if (pixels[j][(int) yCord + height] == 1) {
-                                    for(int k = (int) xCord; k < xCord + width; k++) {
-                                        for(int l = (int) yCord; l < yCord + height; l++) {
+                                    for(int k = (int) xCord - weaponPower; k < xCord + width + weaponPower; k++) {
+                                        for(int l = (int) yCord - weaponPower; l < yCord + height + weaponPower; l++) {
                                             pixels[k][l] = 0;
-                                            image.setRGB(k, l,(255<<24) | (0<<16) | (0<<8) | 0);
+                                            image.setRGB(k, l,(255<<24) | (60<<16) | (50<<8) | 40);
                                         }
                                     }
                                     id = -1;
@@ -346,5 +347,9 @@ public class MovingObject {
 
     public static void setImage(BufferedImage image) {
         MovingObject.image = image;
+    }
+
+    public void setWeaponPower(int weaponPower) {
+        this.weaponPower = weaponPower;
     }
 }

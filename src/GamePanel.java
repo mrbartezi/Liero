@@ -11,7 +11,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     private MovingObject player;
     private Thread thread;
-    private boolean running, onGround, mousePressed = false, controlPressed = false;
+    private boolean running, onGround;
     private static int fps = 120;
     private int lastMove = 0;
     private int frameWidth, frameHeight;
@@ -24,6 +24,9 @@ public class GamePanel extends JPanel implements Runnable {
     private int crosshairAngle = 180;
     private boolean upArrowPressed = false, downArrowPressed = false;
     private Date date = new Date();
+
+    //PRESSED KEYS BOOLEANS
+    private boolean mousePressed = false, controlPressed = false, shiftPressed = false;
 
 
     public GamePanel(int frameWidth, int frameHeight) {
@@ -55,6 +58,7 @@ public class GamePanel extends JPanel implements Runnable {
         blockWidth = EditMode.getWidth();
         blockHeight = EditMode.getHeight();
 
+        refreshImage();
         start();
     }
 
@@ -73,7 +77,7 @@ public class GamePanel extends JPanel implements Runnable {
                 } else {
                     switch (m.getId()) {
                         case 0:
-                            g2.setPaint(Color.GREEN);
+                            g2.setPaint(Color.DARK_GRAY);
                             break;
                         case 1:
                             g2.setPaint(Color.RED);
@@ -92,26 +96,32 @@ public class GamePanel extends JPanel implements Runnable {
         //CROSSHAIR
         g2.setPaint(Color.LIGHT_GRAY);
         if(lastMove == 1 || lastMove == 11 || lastMove == 0) {
-            g2.drawLine((int)player.getxCord() + player.getWidth(),(int)player.getyCord() + player.getHeight()/2 + 1,
-                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 30),
-                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(crosshairAngle)) * 30));
-            g2.drawLine((int)player.getxCord() + player.getWidth(),(int)player.getyCord() + player.getHeight()/2 + 2,
-                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle))*30),
-                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(crosshairAngle)) * 30));
-            g2.drawLine((int)player.getxCord() + player.getWidth(),(int)player.getyCord() + player.getHeight()/2,
-                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 30),
-                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(crosshairAngle)) * 30));
+            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(crosshairAngle)) * 7),
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(crosshairAngle)) * 15));
+            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(crosshairAngle)) * 7),
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(crosshairAngle)) * 15));
+            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7),
+                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(crosshairAngle)) * 7),
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15),
+                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(crosshairAngle)) * 15));
         }
         else {
-            g2.drawLine((int)player.getxCord(),(int)player.getyCord() + player.getHeight()/2 + 1,
-                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 30),
-                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(-crosshairAngle)) * 30));
-            g2.drawLine((int)player.getxCord(),(int)player.getyCord() + player.getHeight()/2 + 2,
-                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle))*30),
-                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(-crosshairAngle)) * 30));
-            g2.drawLine((int)player.getxCord(),(int)player.getyCord() + player.getHeight()/2,
-                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 30),
-                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(-crosshairAngle)) * 30));
+            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(-crosshairAngle)) * 7),
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(-crosshairAngle)) * 15));
+            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(-crosshairAngle)) * 7),
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(-crosshairAngle)) * 15));
+            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7),
+                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(-crosshairAngle)) * 7),
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15),
+                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(-crosshairAngle)) * 15));
         }
 
 
@@ -176,6 +186,10 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
             /////////////////
+            if(shiftPressed && framesCounter%10 == 0) {
+                shoot();
+            }
+            /////////////////
 
             repaint();
         }
@@ -230,7 +244,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         else if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
-            shoot();
+            shiftPressed = true;
         }
 
         //////////////////////////////////////////
@@ -283,6 +297,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
             controlPressed = false;
+        }
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            shiftPressed = false;
         }
     }
 
@@ -369,6 +386,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         MovingObject bullet = new MovingObject(1, 3,3);
+        bullet.setWeaponPower(20);
         if(lastMove == 1 || lastMove == 11 || lastMove == 0) {
             bullet.setxCord(player.getxCord() + player.getWidth());
             bullet.setyCord(player.getyCord() + player.getHeight()/2);
@@ -397,10 +415,10 @@ public class GamePanel extends JPanel implements Runnable {
             for(int j = 0; j < frameHeight; j++) {
                 switch (pixels[i][j]){
                     case 0:
-                        image.setRGB(i, j,(255<<24) | (0<<16) | (0<<8) | 0);
+                        image.setRGB(i, j,(255<<24) | (60<<16) | (50<<8) | 40);
                         break;
                     case 1:
-                        image.setRGB(i, j, p);
+                        image.setRGB(i, j, (255<<24) | (130<<16) | (100<<8) | 80);
                         break;
                 }
             }
