@@ -3,11 +3,13 @@ ESC = reset program
 UP = jump
 RIGHT = move right
 LEFT = move left
+SHIFT = shoot
 
 F1 = turn on/off edit mode
 
 EDIT MODE:
 Mouse click = create new block
+CONTROL + Mouse click = create multiple new blocks
 Numpad 6 = increase block width
 Numpad 4 = decrease block width
 Numpad 8 = increase block height

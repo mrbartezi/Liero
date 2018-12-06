@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -17,6 +18,7 @@ public class GamePanel extends JPanel implements Runnable {
     private static boolean editMode = false;
     private BufferedImage image;
     private int blockWidth, blockHeight, x1, x2, y1, y2;
+    private ArrayList<MovingObject> movingObjects = new ArrayList<>();
 
 
     public GamePanel(int frameWidth, int frameHeight) {
@@ -36,12 +38,14 @@ public class GamePanel extends JPanel implements Runnable {
         MovingObject.setFps(fps);
 
         image = new BufferedImage(frameWidth, frameHeight, BufferedImage.TYPE_INT_RGB);
+        MovingObject.setImage(image);
 
         thread = new Thread(this);
 
         player = new MovingObject(0,10,30);
         player.setxCord(frameWidth/2);
         player.setyCord(frameHeight/2);
+        movingObjects.add(player);
 
         blockWidth = EditMode.getWidth();
         blockHeight = EditMode.getHeight();
@@ -52,15 +56,33 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        pixels = MovingObject.getPixels();
+        image = MovingObject.getImage();
 
         g2.drawImage(image, 0, 0, null);
 
-        g2.setPaint(Color.RED);
-        Rectangle2D rect = new Rectangle2D.Double(player.getxCord(), player.getyCord(),
-                player.getWidth(), player.getHeight());
-        g2.fill(rect);
-        g2.draw(rect);
+        try {
+            for (MovingObject m : movingObjects) {
+                if (m.getId() == -1) {
+                    movingObjects.remove(m);
+                } else {
+                    switch (m.getId()) {
+                        case 0:
+                            g2.setPaint(Color.GREEN);
+                            break;
+                        case 1:
+                            g2.setPaint(Color.RED);
+                            break;
+                    }
+                    Rectangle2D rect = new Rectangle2D.Double(m.getxCord(), m.getyCord(),
+                            m.getWidth(), m.getHeight());
+                    g2.fill(rect);
+                    g2.draw(rect);
+                }
+            }
+        }catch (Exception e) {
 
+        }
 
         if(editMode) {
             g2.setPaint(Color.GREEN);
@@ -76,6 +98,7 @@ public class GamePanel extends JPanel implements Runnable {
     @Override
     public void run() {
         while (running) {
+
             try {
                 Thread.sleep(1000/fps);
             } catch (InterruptedException e) {
@@ -89,9 +112,12 @@ public class GamePanel extends JPanel implements Runnable {
                 player.setxSpeed(-1000);
             }
 
-            player.calculatePosition();
+            for(MovingObject mO : movingObjects) {
+                mO.calculatePosition();
+            }
+            pixels = MovingObject.getPixels();
 
-            if (mousePressed && editMode) {
+            if (editMode && controlPressed && mousePressed) {
                 makeBlock();
             }
             repaint();
@@ -138,6 +164,10 @@ public class GamePanel extends JPanel implements Runnable {
         }
         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
             lastMove = 2;
+        }
+
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            shoot();
         }
 
         //////////////////////////////////////////
@@ -193,6 +223,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void mousePressed(MouseEvent e) {
+        makeBlock();
         mousePressed = true;
     }
 
@@ -242,19 +273,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         MovingObject.setPixels(pixels);
 
-        int alpha = 255;
-        int red = 255;
-        int green = 255;
-        int blue = 255;
-        int p = (alpha<<24) | (red<<16) | (green<<8) | blue;
-
-        for(int i = 0; i < frameWidth; i++) {
-            for(int j = 0; j < frameHeight; j++) {
-                if(pixels[i][j] == 1) {
-                    image.setRGB(i, j, p);
-                }
-            }
-        }
+        refreshImage();
     }
 
     public void deleteLastBlock() {
@@ -271,5 +290,50 @@ public class GamePanel extends JPanel implements Runnable {
         MovingObject.setPixels(pixels);
 
         EditMode.blockList.remove(EditMode.blockList.size()-1);
+    }
+
+    private void shoot() {
+        if(lastMove == 1 || lastMove == 11 || lastMove == 0) {
+        }
+        else {
+        }
+
+        MovingObject bullet = new MovingObject(1, 3,3);
+        if(lastMove == 1 || lastMove == 11 || lastMove == 0) {
+            bullet.setxCord(player.getxCord() + player.getWidth() + 1);
+            bullet.setyCord(player.getyCord() + player.getHeight()/2);
+            bullet.setxSpeed(1000);
+        }
+        else {
+            bullet.setxCord(player.getxCord() - 1);
+            bullet.setyCord(player.getyCord() + player.getHeight()/2);
+            bullet.setxSpeed(-1000);
+        }
+        movingObjects.add(bullet);
+    }
+
+    private void refreshImage() {
+        image = MovingObject.getImage();
+
+        int alpha = 255;
+        int red = 255;
+        int green = 255;
+        int blue = 255;
+        int p = (alpha<<24) | (red<<16) | (green<<8) | blue;
+
+        for(int i = 0; i < frameWidth; i++) {
+            for(int j = 0; j < frameHeight; j++) {
+                switch (pixels[i][j]){
+                    case 0:
+                        image.setRGB(i, j,(255<<24) | (0<<16) | (0<<8) | 0);
+                        break;
+                    case 1:
+                        image.setRGB(i, j, p);
+                        break;
+                }
+            }
+        }
+
+        MovingObject.setImage(image);
     }
 }

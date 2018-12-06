@@ -1,3 +1,5 @@
+import java.awt.image.BufferedImage;
+
 public class MovingObject {
     private static int frameWidth;
     private static int frameHeight;
@@ -13,6 +15,7 @@ public class MovingObject {
     private double yAcc = 0.0;
     private static int fps = 120;
     private static int[][] pixels;
+    private static BufferedImage image;
 
     public MovingObject(int id, int width, int height) {
         this.id = id;
@@ -21,96 +24,201 @@ public class MovingObject {
     }
 
     public void calculatePosition() {
+        if(id == 0) {
+            // Air resistance
+            xAcc = -30 * xSpeed;
+            //yAcc = -1/2 * ySpeed;
 
-        // Air resistance
-        xAcc =  -30*xSpeed;
-        //yAcc = -1/2 * ySpeed;
 
+            xSpeed += xAcc / fps;
+            ySpeed += gravAcc / fps + yAcc / fps;
 
-        xSpeed += xAcc / fps;
-        ySpeed += gravAcc / fps + yAcc / fps;
-
-        if(xSpeed < -1){
-            loop1:
-            for(int i = 0; i > xSpeed/fps * 10; i--) {
-                if(xCord > 0) {
-                    xCord -= 0.1;
-                }
-                if(i%10 == 0) {
-                    for(int j = (int)yCord; j < (int)yCord + height; j++) {
-                        if(pixels != null) {
-                            if (pixels[(int) xCord][j] == 1) {
-                                xCord += 1;
-                                xSpeed = 0;
-                                break loop1;
+            if (xSpeed < -1) {
+                loop1:
+                for (int i = 0; i > xSpeed / fps * 10; i--) {
+                    if (xCord > 0) {
+                        xCord -= 0.1;
+                    }
+                    else {
+                        xSpeed = 0;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) yCord; j < (int) yCord + height; j++) {
+                            if (pixels != null) {
+                                if (pixels[(int) xCord][j] == 1) {
+                                    xCord += 1;
+                                    xSpeed = 0;
+                                    break loop1;
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
-        else if(xSpeed >= 1) {
-            loop2:
-            for(int i = 0; i < xSpeed/fps*10; i++) {
-                if(xCord + width < frameWidth - 1) {
-                    xCord += 0.1;
-                }
-                if(i%10 == 0) {
-                    for(int j = (int)yCord; j < (int)yCord + height; j++) {
-                        if(pixels != null) {
-                            if (pixels[(int) xCord + width][j] == 1) {
-                                xCord -= 1;
-                                xSpeed = 0;
-                                break loop2;
+            } else if (xSpeed >= 1) {
+                loop2:
+                for (int i = 0; i < xSpeed / fps * 10; i++) {
+                    if (xCord + width < frameWidth - 1) {
+                        xCord += 0.1;
+                    }
+                    else {
+                        xSpeed = 0;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) yCord; j < (int) yCord + height; j++) {
+                            if (pixels != null) {
+                                if (pixels[(int) xCord + width][j] == 1) {
+                                    xCord -= 1;
+                                    xSpeed = 0;
+                                    break loop2;
+                                }
                             }
                         }
                     }
                 }
+            } else {
+                xSpeed = 0;
             }
-        }
-        else {
-            xSpeed = 0;
-        }
-        if(ySpeed < -1){
-            loop3:
-            for(int i = 0; i< (-1)*ySpeed/fps*10; i++) {
-                if(yCord > 0) {
-                    yCord -= 0.1;
-                }
-                if(i%10 == 0) {
-                    for(int j = (int)xCord; j < xCord + width; j++) {
-                        if(pixels != null) {
-                            if (pixels[j][(int) yCord] == 1) {
-                                yCord += 1;
-                                ySpeed = 0;
-                                break loop3;
+            if (ySpeed < -1) {
+                loop3:
+                for (int i = 0; i < (-1) * ySpeed / fps * 10; i++) {
+                    if (yCord > 0) {
+                        yCord -= 0.1;
+                    }
+                    else {
+                        ySpeed = 0;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) xCord; j < xCord + width; j++) {
+                            if (pixels != null) {
+                                if (pixels[j][(int) yCord] == 1) {
+                                    yCord += 1;
+                                    ySpeed = 0;
+                                    break loop3;
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
-        else if(ySpeed >= 1.0) {
-            loop4:
-            for(int i = 0; i < ySpeed/fps*10; i++) {
-                if(yCord + height < frameHeight - 1) {
-                    yCord += 0.1;
-                }
-                if(i%10 == 0) {
-                    for(int j = (int)xCord; j < xCord + width; j++) {
-                        if(pixels != null) {
-                            if (pixels[j][(int) yCord + height] == 1) {
-                                yCord -= 1;
-                                ySpeed = 0;
-                                break loop4;
+            } else if (ySpeed >= 1.0) {
+                loop4:
+                for (int i = 0; i < ySpeed / fps * 10; i++) {
+                    if (yCord + height < frameHeight - 1) {
+                        yCord += 0.1;
+                    }
+                    else {
+                        ySpeed = 0;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) xCord; j < xCord + width; j++) {
+                            if (pixels != null) {
+                                if (pixels[j][(int) yCord + height] == 1) {
+                                    yCord -= 1;
+                                    ySpeed = 0;
+                                    break loop4;
+                                }
                             }
                         }
                     }
                 }
+            } else {
+                ySpeed = 0;
             }
         }
-        else {
-            ySpeed = 0;
+        //////
+        if(id == 1) {
+            if (xSpeed < -1) {
+                loop1:
+                for (int i = 0; i > xSpeed / fps * 10; i--) {
+                    if (xCord > 0) {
+                        xCord -= 0.1;
+                    }
+                    else {
+                        id = -1;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) yCord; j < (int) yCord + height; j++) {
+                            if (pixels != null) {
+                                if (pixels[(int) xCord][j] == 1) {
+                                    pixels[(int) xCord][j] = 0;
+                                    id = -1;
+                                    image.setRGB((int) xCord, j,(255<<24) | (0<<16) | (0<<8) | 0);
+                                    break loop1;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (xSpeed >= 1) {
+                loop2:
+                for (int i = 0; i < xSpeed / fps * 10; i++) {
+                    if (xCord + width < frameWidth - 1) {
+                        xCord += 0.1;
+                    }
+                    else {
+                        id = -1;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) yCord; j < (int) yCord + height; j++) {
+                            if (pixels != null) {
+                                if (pixels[(int) xCord + width][j] == 1) {
+                                    pixels[(int) xCord + width][j] = 0;
+                                    id = -1;
+                                    image.setRGB((int) xCord + width, j,(255<<24) | (0<<16) | (0<<8) | 0);
+                                    break loop2;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                xSpeed = 0;
+            }
+            if (ySpeed < -1) {
+                loop3:
+                for (int i = 0; i < (-1) * ySpeed / fps * 10; i++) {
+                    if (yCord > 0) {
+                        yCord -= 0.1;
+                    }
+                    else {
+                        id = -1;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) xCord; j < xCord + width; j++) {
+                            if (pixels != null) {
+                                if (pixels[j][(int) yCord] == 1) {
+                                    id = -1;
+                                    image.setRGB(j, (int) yCord,(255<<24) | (0<<16) | (0<<8) | 0);
+                                    break loop3;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (ySpeed >= 1.0) {
+                loop4:
+                for (int i = 0; i < ySpeed / fps * 10; i++) {
+                    if (yCord + height < frameHeight - 1) {
+                        yCord += 0.1;
+                    }
+                    else {
+                        id = -1;
+                    }
+                    if (i % 10 == 0) {
+                        for (int j = (int) xCord; j < xCord + width; j++) {
+                            if (pixels != null) {
+                                if (pixels[j][(int) yCord + height] == 1) {
+                                    pixels[j][(int) yCord + height] = 0;
+                                    image.setRGB(j, (int) yCord,(255<<24) | (0<<16) | (0<<8) | 0);
+                                    id = -1;
+                                    break loop4;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                ySpeed = 0;
+            }
         }
     }
 
@@ -200,5 +308,13 @@ public class MovingObject {
 
     public static void setPixels(int[][] pixels) {
         MovingObject.pixels = pixels;
+    }
+
+    public static BufferedImage getImage() {
+        return image;
+    }
+
+    public static void setImage(BufferedImage image) {
+        MovingObject.image = image;
     }
 }
