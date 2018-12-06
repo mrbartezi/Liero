@@ -31,7 +31,19 @@ public class MovingObject {
 
 
             xSpeed += xAcc / fps;
-            ySpeed += gravAcc / fps + yAcc / fps;
+
+            //Don't add gravity acceleration to ySpeed when on ground.
+            if((int)yCord + height + 1 < frameHeight) {
+                for (int i = (int) xCord; i < (int) xCord + width; i++) {
+                    if (pixels[i][(int) yCord + height + 1] == 1) {
+                        break;
+                    }
+                    if (i == (int) xCord + width - 1) {
+                        ySpeed += gravAcc / fps;
+                    }
+                }
+            }
+            ySpeed += yAcc / fps;
 
             if (xSpeed < -1) {
                 loop1:
@@ -139,9 +151,13 @@ public class MovingObject {
                         for (int j = (int) yCord; j < (int) yCord + height; j++) {
                             if (pixels != null) {
                                 if (pixels[(int) xCord][j] == 1) {
-                                    pixels[(int) xCord][j] = 0;
+                                    for(int k = (int)yCord; k < yCord + height; k++) {
+                                        for(int l = (int)xCord; l < xCord + width; l++) {
+                                            pixels[l][k] = 0;
+                                            image.setRGB(l, k, (255 << 24) | (0 << 16) | (0 << 8) | 0);
+                                        }
+                                    }
                                     id = -1;
-                                    image.setRGB((int) xCord, j,(255<<24) | (0<<16) | (0<<8) | 0);
                                     break loop1;
                                 }
                             }
@@ -161,9 +177,13 @@ public class MovingObject {
                         for (int j = (int) yCord; j < (int) yCord + height; j++) {
                             if (pixels != null) {
                                 if (pixels[(int) xCord + width][j] == 1) {
-                                    pixels[(int) xCord + width][j] = 0;
+                                    for(int k = (int) yCord; k < yCord + height; k++) {
+                                        for(int l = (int) xCord; l < xCord + width; l++) {
+                                            pixels[l][k] = 0;
+                                            image.setRGB(l, k,(255<<24) | (0<<16) | (0<<8) | 0);
+                                        }
+                                    }
                                     id = -1;
-                                    image.setRGB((int) xCord + width, j,(255<<24) | (0<<16) | (0<<8) | 0);
                                     break loop2;
                                 }
                             }
@@ -186,8 +206,14 @@ public class MovingObject {
                         for (int j = (int) xCord; j < xCord + width; j++) {
                             if (pixels != null) {
                                 if (pixels[j][(int) yCord] == 1) {
+                                    for(int k = (int) xCord; k < xCord + width; k++) {
+                                        for(int l = (int)yCord; l < yCord + height; l++) {
+                                            pixels[k][l] = 0;
+                                            image.setRGB(k, l,(255<<24) | (0<<16) | (0<<8) | 0);
+                                        }
+                                    }
+
                                     id = -1;
-                                    image.setRGB(j, (int) yCord,(255<<24) | (0<<16) | (0<<8) | 0);
                                     break loop3;
                                 }
                             }
@@ -207,8 +233,12 @@ public class MovingObject {
                         for (int j = (int) xCord; j < xCord + width; j++) {
                             if (pixels != null) {
                                 if (pixels[j][(int) yCord + height] == 1) {
-                                    pixels[j][(int) yCord + height] = 0;
-                                    image.setRGB(j, (int) yCord,(255<<24) | (0<<16) | (0<<8) | 0);
+                                    for(int k = (int) xCord; k < xCord + width; k++) {
+                                        for(int l = (int) yCord; l < yCord + height; l++) {
+                                            pixels[k][l] = 0;
+                                            image.setRGB(k, l,(255<<24) | (0<<16) | (0<<8) | 0);
+                                        }
+                                    }
                                     id = -1;
                                     break loop4;
                                 }

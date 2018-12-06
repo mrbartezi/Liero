@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.*;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -15,10 +16,14 @@ public class GamePanel extends JPanel implements Runnable {
     private int lastMove = 0;
     private int frameWidth, frameHeight;
     private int[][] pixels;
+    private int framesCounter = 0, tempFramesCounter = 0, FPS = 0;
     private static boolean editMode = false;
     private BufferedImage image;
     private int blockWidth, blockHeight, x1, x2, y1, y2;
     private ArrayList<MovingObject> movingObjects = new ArrayList<>();
+    private int crosshairAngle = 180;
+    private boolean upArrowPressed = false, downArrowPressed = false;
+    private Date date = new Date();
 
 
     public GamePanel(int frameWidth, int frameHeight) {
@@ -84,6 +89,33 @@ public class GamePanel extends JPanel implements Runnable {
 
         }
 
+        //CROSSHAIR
+        g2.setPaint(Color.LIGHT_GRAY);
+        if(lastMove == 1 || lastMove == 11 || lastMove == 0) {
+            g2.drawLine((int)player.getxCord() + player.getWidth(),(int)player.getyCord() + player.getHeight()/2 + 1,
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 30),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(crosshairAngle)) * 30));
+            g2.drawLine((int)player.getxCord() + player.getWidth(),(int)player.getyCord() + player.getHeight()/2 + 2,
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle))*30),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(crosshairAngle)) * 30));
+            g2.drawLine((int)player.getxCord() + player.getWidth(),(int)player.getyCord() + player.getHeight()/2,
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 30),
+                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(crosshairAngle)) * 30));
+        }
+        else {
+            g2.drawLine((int)player.getxCord(),(int)player.getyCord() + player.getHeight()/2 + 1,
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 30),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(-crosshairAngle)) * 30));
+            g2.drawLine((int)player.getxCord(),(int)player.getyCord() + player.getHeight()/2 + 2,
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle))*30),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(-crosshairAngle)) * 30));
+            g2.drawLine((int)player.getxCord(),(int)player.getyCord() + player.getHeight()/2,
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 30),
+                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(-crosshairAngle)) * 30));
+        }
+
+
+
         if(editMode) {
             g2.setPaint(Color.GREEN);
             if (getMousePosition() != null) {
@@ -93,12 +125,20 @@ public class GamePanel extends JPanel implements Runnable {
                 g2.draw(ghostRect);
             }
         }
+        g2.setPaint(Color.YELLOW);
+        g2.drawString(FPS + " " , 0,10);
     }
 
     @Override
     public void run() {
         while (running) {
+            framesCounter++;
 
+            if(new Date().getTime() - date.getTime() >= 250) {
+                date = new Date();
+                FPS = (framesCounter - tempFramesCounter)*4;
+                tempFramesCounter = framesCounter;
+            }
             try {
                 Thread.sleep(1000/fps);
             } catch (InterruptedException e) {
@@ -112,14 +152,31 @@ public class GamePanel extends JPanel implements Runnable {
                 player.setxSpeed(-1000);
             }
 
-            for(MovingObject mO : movingObjects) {
-                mO.calculatePosition();
+            try {
+                for (MovingObject mO : movingObjects) {
+                    mO.calculatePosition();
+                }
+            }catch (Exception e) {
+
             }
             pixels = MovingObject.getPixels();
-
+            /////////////////
             if (editMode && controlPressed && mousePressed) {
                 makeBlock();
             }
+            /////////////////
+            if(upArrowPressed) {
+                if(crosshairAngle > 90) {
+                    crosshairAngle -= 1;
+                }
+            }
+            if(downArrowPressed) {
+                if(crosshairAngle < 270) {
+                    crosshairAngle += 1;
+                }
+            }
+            /////////////////
+
             repaint();
         }
     }
@@ -151,7 +208,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         ///////////////////////////////////////////////
 
-        if(e.getKeyCode() == KeyEvent.VK_UP) {
+        if(e.getKeyCode() == KeyEvent.VK_SPACE) {
             onGround = true;
 
             if(onGround) {
@@ -162,17 +219,23 @@ public class GamePanel extends JPanel implements Runnable {
         if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
             lastMove = 1;
         }
-        if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+        else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
             lastMove = 2;
         }
+        else if(e.getKeyCode() == KeyEvent.VK_UP) {
+            upArrowPressed = true;
+        }
+        else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+            downArrowPressed = true;
+        }
 
-        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+        else if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
             shoot();
         }
 
         //////////////////////////////////////////
 
-        if(e.getKeyCode() == KeyEvent.VK_F1) {
+        else if(e.getKeyCode() == KeyEvent.VK_F1) {
             if(editMode) {
                 editMode = false;
             }
@@ -181,18 +244,17 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        if(e.getKeyCode() == KeyEvent.VK_E) {
+        else if(e.getKeyCode() == KeyEvent.VK_E) {
             System.out.println(player.getxCord() + " : " + player.getyCord() + " : " + player.getySpeed());
         }
 
-        if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+        else if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
             controlPressed = true;
         }
 
-        if(e.getKeyCode() == KeyEvent.VK_Z) {
+        else if(e.getKeyCode() == KeyEvent.VK_Z) {
             if(controlPressed) {
                 deleteLastBlock();
-                System.out.println("d");
             }
         }
     }
@@ -206,10 +268,16 @@ public class GamePanel extends JPanel implements Runnable {
                 lastMove = 11;
             }
         }
-        if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+         if(e.getKeyCode() == KeyEvent.VK_LEFT) {
             if(lastMove != 1) {
                 lastMove = 12;
             }
+        }
+        if(e.getKeyCode() == KeyEvent.VK_UP) {
+            upArrowPressed = false;
+        }
+        if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+            downArrowPressed = false;
         }
         ///////////////////////////////////////////
 
@@ -223,7 +291,9 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void mousePressed(MouseEvent e) {
-        makeBlock();
+        if(editMode) {
+            makeBlock();
+        }
         mousePressed = true;
     }
 
@@ -300,14 +370,16 @@ public class GamePanel extends JPanel implements Runnable {
 
         MovingObject bullet = new MovingObject(1, 3,3);
         if(lastMove == 1 || lastMove == 11 || lastMove == 0) {
-            bullet.setxCord(player.getxCord() + player.getWidth() + 1);
+            bullet.setxCord(player.getxCord() + player.getWidth());
             bullet.setyCord(player.getyCord() + player.getHeight()/2);
-            bullet.setxSpeed(1000);
+            bullet.setxSpeed(Math.cos(Math.toRadians(crosshairAngle)) * (-1000));
+            bullet.setySpeed(Math.sin(Math.toRadians(crosshairAngle)) * (-1000));
         }
         else {
-            bullet.setxCord(player.getxCord() - 1);
+            bullet.setxCord(player.getxCord());
             bullet.setyCord(player.getyCord() + player.getHeight()/2);
-            bullet.setxSpeed(-1000);
+            bullet.setxSpeed(Math.cos(Math.toRadians(-crosshairAngle)) * 1000);
+            bullet.setySpeed(Math.sin(Math.toRadians(-crosshairAngle)) * 1000);
         }
         movingObjects.add(bullet);
     }

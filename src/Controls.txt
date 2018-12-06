@@ -1,6 +1,6 @@
 ESC = reset program
 
-UP = jump
+SPACE = jump
 RIGHT = move right
 LEFT = move left
 SHIFT = shoot
