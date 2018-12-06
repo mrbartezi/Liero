@@ -9,6 +9,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener {
 
     private GamePanel gamePanel;
     private int frameWidth = 1600, frameHeight = 900;
+    private int mapWidth = 1600, mapHeight = 900;
 
     public MainFrame() {
 
@@ -30,7 +31,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener {
 
         addMouseListener(this);
 
-        gamePanel = new GamePanel(frameWidth, frameHeight);
+        gamePanel = new GamePanel(frameWidth, frameHeight, mapWidth, mapHeight);
 
         add(gamePanel, BorderLayout.CENTER);
 
@@ -47,7 +48,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener {
         gamePanel.keyPressed(e);
         if(e.getKeyCode() == KeyEvent.VK_R) {
             remove(gamePanel);
-            gamePanel = new GamePanel(frameWidth, frameHeight);
+            gamePanel = new GamePanel(frameWidth, frameHeight, mapWidth, mapHeight);
             add(gamePanel, BorderLayout.CENTER);
             pack();
         }

@@ -27,15 +27,15 @@ public class GamePanel extends JPanel implements Runnable {
     private int xOffScreen, yOffScreen;
 
     //PRESSED KEYS BOOLEANS
-    private boolean mousePressed = false, controlPressed = false, shiftPressed = false, upArrowPressed = false,
-            downArrowPressed = false;
+    private boolean mouse1Pressed = false, mouse2Pressed = false, controlPressed = false, shiftPressed = false,
+            upArrowPressed = false, downArrowPressed = false;
 
 
-    public GamePanel(int frameWidth, int frameHeight) {
+    public GamePanel(int frameWidth, int frameHeight, int mapWidth, int mapHeight) {
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
-        mapWidth = 1600;
-        mapHeight = 900;
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
@@ -88,20 +88,6 @@ public class GamePanel extends JPanel implements Runnable {
                     switch (m.getId()) {
                         case 0:
                             g2.setPaint(Color.DARK_GRAY);
-                            /*
-                            if(m.getxCord() + m.getWidth() > frameWidth && m.getyCord() + m.getHeight() > frameHeight) {
-                                rect = new Rectangle2D.Double(frameWidth - m.getWidth(), frameHeight - m.getHeight(),
-                                        m.getWidth(), m.getHeight());
-                            }
-                            else if(m.getxCord() + m.getWidth() > frameWidth) {
-                                rect = new Rectangle2D.Double(frameWidth - m.getWidth(), m.getyCord(),
-                                        m.getWidth(), m.getHeight());
-                            }
-                            else if(m.getyCord() + m.getHeight() > frameHeight){
-                                rect = new Rectangle2D.Double(m.getxCord(), frameHeight - m.getHeight(),
-                                        m.getWidth(), m.getHeight());
-                            }
-                            */
                             break;
                         case 1:
                             g2.setPaint(Color.WHITE);
@@ -150,6 +136,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         if(editMode) {
             g2.setPaint(Color.GREEN);
+            if(mouse2Pressed) {
+                g2.setPaint(Color.RED);
+            }
             if (getMousePosition() != null) {
                 Rectangle2D ghostRect = new Rectangle2D.Double(getMousePosition().x - blockWidth/2,
                         getMousePosition().y - blockHeight/2, blockWidth, blockHeight);
@@ -207,8 +196,13 @@ public class GamePanel extends JPanel implements Runnable {
             }
             pixels = MovingObject.getPixels();
             /////////////////
-            if (editMode && controlPressed && mousePressed) {
-                makeBlock();
+            if (editMode && controlPressed ) {
+                if(mouse2Pressed) {
+                    deleteBlock();
+                }
+                else if(mouse1Pressed) {
+                    createBlock();
+                }
             }
             /////////////////
             if(upArrowPressed) {
@@ -269,23 +263,23 @@ public class GamePanel extends JPanel implements Runnable {
         if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
             lastMove = 1;
         }
-        else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+        if(e.getKeyCode() == KeyEvent.VK_LEFT) {
             lastMove = 2;
         }
-        else if(e.getKeyCode() == KeyEvent.VK_UP) {
+        if(e.getKeyCode() == KeyEvent.VK_UP) {
             upArrowPressed = true;
         }
-        else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+        if(e.getKeyCode() == KeyEvent.VK_DOWN) {
             downArrowPressed = true;
         }
 
-        else if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
             shiftPressed = true;
         }
 
         //////////////////////////////////////////
 
-        else if(e.getKeyCode() == KeyEvent.VK_F1) {
+        if(e.getKeyCode() == KeyEvent.VK_F1) {
             if(editMode) {
                 editMode = false;
             }
@@ -294,18 +288,12 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        else if(e.getKeyCode() == KeyEvent.VK_E) {
+        if(e.getKeyCode() == KeyEvent.VK_E) {
             System.out.println(player.getxCord() + " : " + player.getyCord() + " : " + player.getySpeed());
         }
 
-        else if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+        if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
             controlPressed = true;
-        }
-
-        else if(e.getKeyCode() == KeyEvent.VK_Z) {
-            if(controlPressed) {
-                deleteLastBlock();
-            }
         }
     }
 
@@ -340,18 +328,28 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void mouseClicked(MouseEvent e) {
-
     }
 
     public void mousePressed(MouseEvent e) {
         if(editMode) {
-            makeBlock();
+            if(e.getButton() == MouseEvent.BUTTON1) {
+                createBlock();
+                mouse1Pressed = true;
+            }
+            if(e.getButton() == MouseEvent.BUTTON3) {
+                deleteBlock();
+                mouse2Pressed = true;
+            }
         }
-        mousePressed = true;
     }
 
     public void mouseReleased(MouseEvent e) {
-        mousePressed = false;
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            mouse1Pressed = false;
+        }
+        if(e.getButton() == MouseEvent.BUTTON3) {
+            mouse2Pressed = false;
+        }
 
     }
 
@@ -364,7 +362,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
 
-    public void makeBlock() {
+    public void createBlock() {
         blockWidth = EditMode.getWidth();
         blockHeight = EditMode.getHeight();
 
@@ -377,7 +375,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         }
 
-        EditMode.blockList.add(new Rectangle2D.Double(x1 + blockWidth/2, y1 + blockHeight/2, blockWidth, blockHeight));
 
         if(x1 < 0) {
             x1 = 0;
@@ -403,20 +400,43 @@ public class GamePanel extends JPanel implements Runnable {
         refreshImage();
     }
 
-    public void deleteLastBlock() {
-        double deleteX = EditMode.blockList.get(EditMode.blockList.size()-1).getX();
-        double deleteY = EditMode.blockList.get(EditMode.blockList.size()-1).getY();
-        double deleteWidth = EditMode.blockList.get(EditMode.blockList.size()-1).getWidth();
-        double deleteHeight = EditMode.blockList.get(EditMode.blockList.size()-1).getHeight();
+    public void deleteBlock() {
+        blockWidth = EditMode.getWidth();
+        blockHeight = EditMode.getHeight();
 
-        for(int i = (int)deleteX; i < deleteX + deleteWidth; i++) {
-            for(int j = (int)deleteY; j < deleteY + deleteHeight; j++) {
+        try {
+            x1 = getMousePosition().x - blockWidth / 2 + xOffScreen;
+            y1 = getMousePosition().y - blockHeight / 2 + yOffScreen;
+            x2 = getMousePosition().x + blockWidth / 2 + xOffScreen;
+            y2 = getMousePosition().y + blockHeight / 2 + yOffScreen;
+        }catch (Exception e){
+
+        }
+
+
+        if(x1 < 0) {
+            x1 = 0;
+        }
+        if(x2 > mapWidth) {
+            x2 = mapWidth;
+        }
+        if(y1 < 0) {
+            y1 = 0;
+        }
+        if(y2 > mapHeight) {
+            y2 = mapHeight;
+        }
+
+        for (int i = x1; i < x2; i++) {
+            for (int j = y1; j < y2; j++) {
                 pixels[i][j] = 0;
             }
         }
+
         MovingObject.setPixels(pixels);
 
-        EditMode.blockList.remove(EditMode.blockList.size()-1);
+        refreshImage();
+
     }
 
     private void shoot() {

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 public class EditMode {
     private static int width = 100, height = 100;
-    public static ArrayList<Rectangle2D> blockList = new ArrayList<>();
 
     public static void keyTyped(KeyEvent e) {
     }
@@ -72,5 +71,9 @@ public class EditMode {
 
     public static void setHeight(int height) {
         EditMode.height = height;
+    }
+
+    private void saveMap() {
+
     }
 }
