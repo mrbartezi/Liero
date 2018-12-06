@@ -1,8 +1,8 @@
 import java.awt.image.BufferedImage;
 
 public class MovingObject {
-    private static int frameWidth;
-    private static int frameHeight;
+    private static int mapWidth;
+    private static int mapHeight;
     private int width;
     private int height;
     private double xCord = 0.0;
@@ -34,7 +34,7 @@ public class MovingObject {
             xSpeed += xAcc / fps;
 
             //Don't add gravity acceleration to ySpeed when on ground.
-            if((int)yCord + height + 1 < frameHeight) {
+            if((int)yCord + height + 1 < mapHeight) {
                 for (int i = (int) xCord; i < (int) xCord + width; i++) {
                     if (pixels[i][(int) yCord + height + 1] == 1) {
                         break;
@@ -70,7 +70,7 @@ public class MovingObject {
             } else if (xSpeed >= 1) {
                 loop2:
                 for (int i = 0; i < xSpeed / fps * 10; i++) {
-                    if (xCord + width < frameWidth - 1) {
+                    if (xCord + width < mapWidth - 1) {
                         xCord += 0.1;
                     }
                     else {
@@ -115,7 +115,7 @@ public class MovingObject {
             } else if (ySpeed >= 1.0) {
                 loop4:
                 for (int i = 0; i < ySpeed / fps * 10; i++) {
-                    if (yCord + height < frameHeight - 1) {
+                    if (yCord + height < mapHeight - 1) {
                         yCord += 0.1;
                     }
                     else {
@@ -158,16 +158,16 @@ public class MovingObject {
                                         kDownBound = 0;
                                     }
                                     double kUpBound = yCord + height + weaponPower;
-                                    if(kUpBound > frameHeight) {
-                                        kUpBound = frameHeight;
+                                    if(kUpBound > mapHeight) {
+                                        kUpBound = mapHeight;
                                     }
                                     int lDownBound = (int)xCord - weaponPower;
                                     if(lDownBound < 0) {
                                         lDownBound = 0;
                                     }
                                     double lUpBound = xCord + width + weaponPower;
-                                    if(lUpBound > frameWidth){
-                                        lUpBound = frameWidth;
+                                    if(lUpBound > mapWidth){
+                                        lUpBound = mapWidth;
                                     }
                                     for(int k = kDownBound; k < kUpBound; k++) {
                                         for(int l = lDownBound; l < lUpBound; l++) {
@@ -185,7 +185,7 @@ public class MovingObject {
             } else if (xSpeed >= 1) {
                 loop2:
                 for (int i = 0; i < xSpeed / fps * 10; i++) {
-                    if (xCord + width < frameWidth - 1) {
+                    if (xCord + width < mapWidth - 1) {
                         xCord += 0.1;
                     }
                     else {
@@ -200,16 +200,16 @@ public class MovingObject {
                                         kDownBound = 0;
                                     }
                                     double kUpBound = yCord + height + weaponPower;
-                                    if(kUpBound > frameHeight) {
-                                        kUpBound = frameHeight;
+                                    if(kUpBound > mapHeight) {
+                                        kUpBound = mapHeight;
                                     }
                                     int lDownBound = (int) xCord - weaponPower;
                                     if(lDownBound < 0) {
                                         lDownBound = 0;
                                     }
                                     double lUpBound = xCord + width + weaponPower;
-                                    if(lUpBound > frameWidth){
-                                        lUpBound = frameWidth;
+                                    if(lUpBound > mapWidth){
+                                        lUpBound = mapWidth;
                                     }
                                     for(int k = kDownBound; k < kUpBound; k++) {
                                         for(int l = lDownBound; l < lUpBound; l++) {
@@ -245,16 +245,16 @@ public class MovingObject {
                                         kDownBound = 0;
                                     }
                                     double kUpBound = xCord + width + weaponPower;
-                                    if(kUpBound > frameWidth) {
-                                        kUpBound = frameWidth;
+                                    if(kUpBound > mapWidth) {
+                                        kUpBound = mapWidth;
                                     }
                                     int lDownBound = (int)yCord - weaponPower;
                                     if(lDownBound < 0) {
                                         lDownBound = 0;
                                     }
                                     double lUpBound = yCord + height + weaponPower;
-                                    if(lUpBound > frameHeight){
-                                        lUpBound = frameHeight;
+                                    if(lUpBound > mapHeight){
+                                        lUpBound = mapHeight;
                                     }
                                     for(int k = kDownBound; k < kUpBound; k++) {
                                         for(int l = lDownBound; l < lUpBound; l++) {
@@ -273,7 +273,7 @@ public class MovingObject {
             } else if (ySpeed >= 1.0) {
                 loop4:
                 for (int i = 0; i < ySpeed / fps * 10; i++) {
-                    if (yCord + height < frameHeight - 1) {
+                    if (yCord + height < mapHeight - 1) {
                         yCord += 0.1;
                     }
                     else {
@@ -288,16 +288,16 @@ public class MovingObject {
                                         kDownBound = 0;
                                     }
                                     double kUpBound = xCord + width + weaponPower;
-                                    if(kUpBound > frameWidth) {
-                                        kUpBound = frameWidth;
+                                    if(kUpBound > mapWidth) {
+                                        kUpBound = mapWidth;
                                     }
                                     int lDownBound = (int)yCord - weaponPower;
                                     if(lDownBound < 0) {
                                         lDownBound = 0;
                                     }
                                     double lUpBound = yCord + height + weaponPower;
-                                    if(lUpBound > frameHeight){
-                                        lUpBound = frameHeight;
+                                    if(lUpBound > mapHeight){
+                                        lUpBound = mapHeight;
                                     }
                                     for(int k = kDownBound; k < kUpBound; k++) {
                                         for(int l = lDownBound; l < lUpBound; l++) {
@@ -386,12 +386,12 @@ public class MovingObject {
         this.ySpeed = ySpeed;
     }
 
-    public static void setFrameWidth(int Width) {
-        frameWidth = Width;
+    public static void setMapWidth(int Width) {
+        mapWidth = Width;
     }
 
-    public static void setFrameHeight(int Height) {
-        frameHeight = Height;
+    public static void setMapHeight(int Height) {
+        mapHeight = Height;
     }
 
     public void setGravAcc(double gravAcc) {

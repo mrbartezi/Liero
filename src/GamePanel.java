@@ -15,6 +15,7 @@ public class GamePanel extends JPanel implements Runnable {
     private static int fps = 120;
     private int lastMove = 0;
     private int frameWidth, frameHeight;
+    private int mapWidth, mapHeight;
     private int[][] pixels;
     private int framesCounter = 0, tempFramesCounter = 0, FPS = 0;
     private static boolean editMode = false;
@@ -22,37 +23,43 @@ public class GamePanel extends JPanel implements Runnable {
     private int blockWidth, blockHeight, x1, x2, y1, y2;
     private ArrayList<MovingObject> movingObjects = new ArrayList<>();
     private int crosshairAngle = 180;
-    private boolean upArrowPressed = false, downArrowPressed = false;
     private Date date = new Date();
+    private int xOffScreen, yOffScreen;
 
     //PRESSED KEYS BOOLEANS
-    private boolean mousePressed = false, controlPressed = false, shiftPressed = false;
+    private boolean mousePressed = false, controlPressed = false, shiftPressed = false, upArrowPressed = false,
+            downArrowPressed = false;
 
 
     public GamePanel(int frameWidth, int frameHeight) {
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
+        mapWidth = 1600;
+        mapHeight = 900;
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
 
-        pixels = new int[frameWidth][frameHeight];
-        for(int i = 0; i < frameWidth; i++) {
-            for(int j = 0; j < frameHeight; j++) {
+
+        pixels = new int[mapWidth][mapHeight];
+        for(int i = 0; i < mapWidth; i++) {
+            for(int j = 0; j < mapHeight; j++) {
                 pixels[i][j] = 0;
             }
         }
         MovingObject.setPixels(pixels);
         MovingObject.setFps(fps);
+        MovingObject.setMapWidth(mapWidth);
+        MovingObject.setMapHeight(mapHeight);
 
-        image = new BufferedImage(frameWidth, frameHeight, BufferedImage.TYPE_INT_RGB);
+        image = new BufferedImage(mapWidth, mapHeight, BufferedImage.TYPE_INT_RGB);
         MovingObject.setImage(image);
 
         thread = new Thread(this);
 
         player = new MovingObject(0,10,30);
-        player.setxCord(frameWidth/2);
-        player.setyCord(frameHeight/2);
+        player.setxCord(mapWidth/2);
+        player.setyCord(mapHeight/2);
         movingObjects.add(player);
 
         blockWidth = EditMode.getWidth();
@@ -68,7 +75,7 @@ public class GamePanel extends JPanel implements Runnable {
         pixels = MovingObject.getPixels();
         image = MovingObject.getImage();
 
-        g2.drawImage(image, 0, 0, null);
+        g2.drawImage(image, -xOffScreen, -yOffScreen, null);
 
         //MOVING OBJECTS
         try {
@@ -76,16 +83,30 @@ public class GamePanel extends JPanel implements Runnable {
                 if (m.getId() == -1) {
                     movingObjects.remove(m);
                 } else {
+                    Rectangle2D rect = new Rectangle2D.Double(m.getxCord() - xOffScreen, m.getyCord() - yOffScreen,
+                            m.getWidth(), m.getHeight());
                     switch (m.getId()) {
                         case 0:
                             g2.setPaint(Color.DARK_GRAY);
+                            /*
+                            if(m.getxCord() + m.getWidth() > frameWidth && m.getyCord() + m.getHeight() > frameHeight) {
+                                rect = new Rectangle2D.Double(frameWidth - m.getWidth(), frameHeight - m.getHeight(),
+                                        m.getWidth(), m.getHeight());
+                            }
+                            else if(m.getxCord() + m.getWidth() > frameWidth) {
+                                rect = new Rectangle2D.Double(frameWidth - m.getWidth(), m.getyCord(),
+                                        m.getWidth(), m.getHeight());
+                            }
+                            else if(m.getyCord() + m.getHeight() > frameHeight){
+                                rect = new Rectangle2D.Double(m.getxCord(), frameHeight - m.getHeight(),
+                                        m.getWidth(), m.getHeight());
+                            }
+                            */
                             break;
                         case 1:
                             g2.setPaint(Color.WHITE);
                             break;
                     }
-                    Rectangle2D rect = new Rectangle2D.Double(m.getxCord(), m.getyCord(),
-                            m.getWidth(), m.getHeight());
                     g2.fill(rect);
                     g2.draw(rect);
                 }
@@ -97,32 +118,32 @@ public class GamePanel extends JPanel implements Runnable {
         //CROSSHAIR
         g2.setPaint(Color.LIGHT_GRAY);
         if(lastMove == 1 || lastMove == 11 || lastMove == 0) {
-            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7),
-                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(crosshairAngle)) * 7),
-                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15),
-                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(crosshairAngle)) * 15));
-            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7),
-                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(crosshairAngle)) * 7),
-                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15),
-                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(crosshairAngle)) * 15));
-            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7),
-                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(crosshairAngle)) * 7),
-                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15),
-                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(crosshairAngle)) * 15));
+            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(crosshairAngle)) * 7 - yOffScreen),
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(crosshairAngle)) * 15 - yOffScreen));
+            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(crosshairAngle)) * 7 - yOffScreen),
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(crosshairAngle)) * 15 - yOffScreen));
+            g2.drawLine((int)(player.getxCord() + player.getWidth() + Math.cos(Math.toRadians(crosshairAngle)) * 7 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(crosshairAngle)) * 7 - yOffScreen),
+                    (int)(player.getxCord() + player.getWidth() - Math.cos(Math.toRadians(crosshairAngle)) * 15 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(crosshairAngle)) * 15 - yOffScreen));
         }
         else {
-            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7),
-                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(-crosshairAngle)) * 7),
-                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15),
-                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(-crosshairAngle)) * 15));
-            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7),
-                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(-crosshairAngle)) * 7),
-                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15),
-                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(-crosshairAngle)) * 15));
-            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7),
-                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(-crosshairAngle)) * 7),
-                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15),
-                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(-crosshairAngle)) * 15));
+            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 - Math.sin(Math.toRadians(-crosshairAngle)) * 7 - yOffScreen),
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 1 + Math.sin(Math.toRadians(-crosshairAngle)) * 15 - yOffScreen));
+            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 - Math.sin(Math.toRadians(-crosshairAngle)) * 7 - yOffScreen),
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 + 2 + Math.sin(Math.toRadians(-crosshairAngle)) * 15 - yOffScreen));
+            g2.drawLine((int)(player.getxCord() - Math.cos(Math.toRadians(-crosshairAngle)) * 7 - xOffScreen),
+                    (int)(player.getyCord() + player.getHeight()/2 - Math.sin(Math.toRadians(-crosshairAngle)) * 7 - yOffScreen),
+                    (int)(player.getxCord() + Math.cos(Math.toRadians(-crosshairAngle)) * 15) - xOffScreen,
+                    (int)(player.getyCord() + player.getHeight()/2 + Math.sin(Math.toRadians(-crosshairAngle)) * 15 - yOffScreen));
         }
 
 
@@ -132,7 +153,6 @@ public class GamePanel extends JPanel implements Runnable {
             if (getMousePosition() != null) {
                 Rectangle2D ghostRect = new Rectangle2D.Double(getMousePosition().x - blockWidth/2,
                         getMousePosition().y - blockHeight/2, blockWidth, blockHeight);
-                //g2.fill(ghostRect);
                 g2.draw(ghostRect);
             }
         }
@@ -147,6 +167,19 @@ public class GamePanel extends JPanel implements Runnable {
         while (running) {
             framesCounter++;
 
+
+            if((int)player.getxCord() + player.getWidth() + frameWidth/2 < mapWidth &&
+                    (int) player.getxCord() + player.getWidth() - frameWidth / 2 >= 0) {
+                xOffScreen = (int) player.getxCord() + player.getWidth() + 2 - frameWidth/2;
+            }
+
+            if((int)player.getyCord() + player.getHeight() + frameHeight/2 < mapHeight &&
+                    (int) player.getyCord() + player.getHeight() - frameHeight/2 >= 0) {
+                yOffScreen = (int) player.getyCord() + player.getHeight() + 9 - frameHeight/2;
+            }
+
+
+            //Setting FPS counter
             if(new Date().getTime() - date.getTime() >= 250) {
                 date = new Date();
                 FPS = (framesCounter - tempFramesCounter)*4;
@@ -336,10 +369,10 @@ public class GamePanel extends JPanel implements Runnable {
         blockHeight = EditMode.getHeight();
 
         try {
-            x1 = getMousePosition().x - blockWidth / 2;
-            y1 = getMousePosition().y - blockHeight / 2;
-            x2 = getMousePosition().x + blockWidth / 2;
-            y2 = getMousePosition().y + blockHeight / 2;
+            x1 = getMousePosition().x - blockWidth / 2 + xOffScreen;
+            y1 = getMousePosition().y - blockHeight / 2 + yOffScreen;
+            x2 = getMousePosition().x + blockWidth / 2 + xOffScreen;
+            y2 = getMousePosition().y + blockHeight / 2 + yOffScreen;
         }catch (Exception e){
 
         }
@@ -349,14 +382,14 @@ public class GamePanel extends JPanel implements Runnable {
         if(x1 < 0) {
             x1 = 0;
         }
-        if(x2 > frameWidth) {
-            x2 = frameWidth;
+        if(x2 > mapWidth) {
+            x2 = mapWidth;
         }
         if(y1 < 0) {
             y1 = 0;
         }
-        if(y2 > frameHeight) {
-            y2 = frameHeight;
+        if(y2 > mapHeight) {
+            y2 = mapHeight;
         }
 
         for (int i = x1; i < x2; i++) {
@@ -418,8 +451,8 @@ public class GamePanel extends JPanel implements Runnable {
         int blue = 255;
         int p = (alpha<<24) | (red<<16) | (green<<8) | blue;
 
-        for(int i = 0; i < frameWidth; i++) {
-            for(int j = 0; j < frameHeight; j++) {
+        for(int i = 0; i < mapWidth; i++) {
+            for(int j = 0; j < mapHeight; j++) {
                 switch (pixels[i][j]){
                     case 0:
                         image.setRGB(i, j,(255<<24) | (60<<16) | (50<<8) | 40);
