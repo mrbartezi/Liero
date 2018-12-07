@@ -9,10 +9,13 @@ SHIFT = shoot
 F1 = turn on/off edit mode
 
 EDIT MODE:
-Mouse click = create new block
-CONTROL + Mouse click = create multiple new blocks
+Mouse1 = create new block
+Mouse2 = delete block
+CONTROL + Mouse1 = create multiple new blocks
+CONTROL + Mouse2 = delete multiple blocks
 Numpad 6 = increase block width
 Numpad 4 = decrease block width
 Numpad 8 = increase block height
 Numpad 2 = decrease block height
 Numpad 5 = rotate block
+S = save map

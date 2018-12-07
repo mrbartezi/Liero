@@ -9,7 +9,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener {
 
     private GamePanel gamePanel;
     private int frameWidth = 1600, frameHeight = 900;
-    private int mapWidth = 1600, mapHeight = 900;
+    private int mapWidth = 3000, mapHeight = 3000;
 
     public MainFrame() {
 
@@ -19,6 +19,7 @@ public class MainFrame extends JFrame implements KeyListener, MouseListener {
         setTitle("Liero");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //FULLSCREEN
         //setUndecorated(true);
         //setExtendedState(JFrame.MAXIMIZED_BOTH);
 

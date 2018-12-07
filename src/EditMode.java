@@ -1,10 +1,16 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.security.Key;
 import java.util.ArrayList;
 
 public class EditMode {
     private static int width = 100, height = 100;
+    private static int[][] pixels;
 
     public static void keyTyped(KeyEvent e) {
     }
@@ -30,6 +36,9 @@ public class EditMode {
             int temp = height;
             height = width;
             width = temp;
+        }
+        if(e.getKeyCode() == KeyEvent.VK_S) {
+            saveMap();
         }
     }
 
@@ -73,7 +82,30 @@ public class EditMode {
         EditMode.height = height;
     }
 
-    private void saveMap() {
+    public static void setPixels(int[][] pixels1) {
+        pixels = pixels1;
+    }
+
+    private static void saveMap() {
+        File file = new File("map.txt");
+        try {
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write(pixels.length + "");
+            bw.newLine();
+            bw.write(pixels[0].length + "");
+
+            for(int i = 0; i < pixels.length; i++) {
+                for(int j = 0; j < pixels[0].length; j++) {
+                    bw.newLine();
+                    bw.write(pixels[i][j] + "");
+                }
+            }
+            bw.close();
+        } catch (IOException e) {
+            System.out.println("Unable to write to file" + file.toString());
+        }
 
     }
 }

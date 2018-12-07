@@ -1,5 +1,5 @@
 ESC = exit program
-ESC = reset program
+R = reset program
 
 SPACE = jump
 RIGHT = move right
@@ -18,3 +18,4 @@ Numpad 4 = decrease block width
 Numpad 8 = increase block height
 Numpad 2 = decrease block height
 Numpad 5 = rotate block
+S = save map

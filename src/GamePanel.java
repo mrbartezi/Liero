@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.*;
 
@@ -31,22 +32,45 @@ public class GamePanel extends JPanel implements Runnable {
             upArrowPressed = false, downArrowPressed = false;
 
 
-    public GamePanel(int frameWidth, int frameHeight, int mapWidth, int mapHeight) {
+    public GamePanel(int frameWidth, int frameHeight, int mapWidth1, int mapHeight1) {
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
-        this.mapWidth = mapWidth;
-        this.mapHeight = mapHeight;
+        mapWidth = mapWidth1;
+        mapHeight = mapHeight1;
         setPreferredSize(new Dimension(frameWidth, frameHeight));
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
-
-
+        /*
         pixels = new int[mapWidth][mapHeight];
         for(int i = 0; i < mapWidth; i++) {
             for(int j = 0; j < mapHeight; j++) {
                 pixels[i][j] = 0;
             }
         }
+        */
+        File file = new File("map.txt");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            int b1 = Integer.valueOf(br.readLine());
+            int b2 = Integer.valueOf(br.readLine());
+            pixels = new int[b1][b2];
+            mapWidth = b1;
+            mapHeight = b2;
+
+            for(int i = 0; i < b1; i++) {
+                for(int j = 0; j < b2; j++) {
+                    pixels[i][j] = Integer.valueOf(br.readLine());
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         MovingObject.setPixels(pixels);
         MovingObject.setFps(fps);
         MovingObject.setMapWidth(mapWidth);
@@ -246,6 +270,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void keyPressed(KeyEvent e) {
         if(editMode) {
             EditMode.keyPressed(e);
+            EditMode.setPixels(pixels);
             blockWidth = EditMode.getWidth();
             blockHeight = EditMode.getHeight();
         }
